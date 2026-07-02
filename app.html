@@ -179,6 +179,7 @@ tbody tr:hover{background:var(--paper-2)}
     <div class="brand">Nume<span>·</span>Brand</div>
     <nav>
       <button class="navlink active" data-mod="clients">Clienți <span class="b" id="cntClients">0</span></button>
+      <button class="navlink" data-mod="requests">Cereri configurator <span class="b" id="cntReq">0</span></button>
       <button class="navlink" data-mod="offers" data-soon>Oferte <span class="b">în curând</span></button>
       <button class="navlink" data-mod="invoices" data-soon>Facturi <span class="b">în curând</span></button>
       <button class="navlink" data-mod="finance" data-soon>Financiar <span class="b">în curând</span></button>
@@ -232,6 +233,30 @@ tbody tr:hover{background:var(--paper-2)}
           <tbody id="clientsBody">
             <tr><td colspan="6" class="empty">Se încarcă…</td></tr>
           </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CERERI CONFIGURATOR -->
+    <section id="mod-requests" class="hidden">
+      <div class="head">
+        <div>
+          <h1>Cereri configurator</h1>
+          <p>Configurații trimise de clienți prin linkurile de proiect — cu vizualizarea AI și prețul intern calculat automat.</p>
+        </div>
+        <button class="btn btn--ghost" id="btnReloadReq">Reîncarcă</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Total cereri</div><div class="v" id="stReqTotal">0</div></div>
+        <div class="stat"><div class="k">Noi</div><div class="v" id="stReqNew">0</div></div>
+        <div class="stat"><div class="k">Valoare estimată (cu TVA)</div><div class="v" id="stReqValue">0</div></div>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Data</th><th>Proiect / Client</th><th>Config</th><th>Cutii</th><th>Preț intern</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="reqBody"><tr><td colspan="7" class="empty">Se încarcă…</td></tr></tbody>
         </table>
       </div>
     </section>
@@ -349,6 +374,20 @@ tbody tr:hover{background:var(--paper-2)}
   </div>
 </div>
 
+<!-- REQUEST DETAIL DRAWER -->
+<div class="overlay" id="overlay3"></div>
+<div class="drawer" id="reqDetail">
+  <div class="drawer__top">
+    <h2>Cerere configurator</h2>
+    <button class="x" id="reqClose" aria-label="Închide">×</button>
+  </div>
+  <div class="drawer__body" id="reqBodyDetail"></div>
+  <div class="drawer__foot">
+    <button class="btn btn--danger" id="btnReqDelete">Șterge</button>
+    <button class="btn btn--ghost" id="btnReqProcessed">Marchează procesat</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -364,10 +403,27 @@ function toast(msg,err){var t=$('toast');t.textContent=msg;t.className='toast sh
 function money(n){return (Number(n)||0).toLocaleString('ro-RO',{minimumFractionDigits:2,maximumFractionDigits:2})+' RON';}
 function tipLabel(t){return ({dezvoltator:'Dezvoltator',constructor:'Constructor',arhitect:'Arhitect',administrator:'Administrator',altul:'Altul'})[t]||t||'—';}
 
+/* ---------------- catalog prețuri (intern, fără TVA) ---------------- */
+var TVA=19;
+var PRICE={ metalica:94, inox:114, lacobel:129, omega:12.5,
+  avizier_1:490, avizier_2:590, avizier_3:690 };
+var MAT_LABEL={ metalica:'Metalică', inox:'Inox', lacobel:'Sticlă Lacobel' };
+var AVZ_LABEL={ none:'—', avizier_1:'Avizier 1', avizier_2:'Avizier 2', avizier_3:'Avizier 3' };
+function computePrice(r){
+  var boxes=(Number(r.box_count)||0)*(PRICE[r.material]||0);
+  var omega=r.omega?(Number(r.box_count)||0)*PRICE.omega:0;
+  var avz=(r.avizier_model && PRICE[r.avizier_model])?PRICE[r.avizier_model]:0;
+  var net=boxes+omega+avz;
+  var vat=net*TVA/100;
+  return { net:net, vat:vat, gross:net+vat, boxes:boxes, omega:omega, avz:avz };
+}
+
 /* ---------------- state ---------------- */
 var CLIENTS=[];
+var REQUESTS=[];
 var editingId=null;
 var currentDetailId=null;
+var currentReqId=null;
 
 /* ---------------- auth ---------------- */
 function gateShow(on){$('gate').classList.toggle('show',on);}
@@ -389,6 +445,7 @@ async function afterLogin(){
   gateShow(false); appShow(true);
   try{var u=await SB.auth.getUser();$('userEmail').textContent=(u.data&&u.data.user&&u.data.user.email)||'';}catch(e){}
   await loadClients();
+  loadRequests();
 }
 
 /* ---------------- clients: load + render ---------------- */
@@ -534,9 +591,133 @@ async function openDetail(id){
       '<div class="box"><div class="k">Încasat</div><div class="v" id="dInc">—</div></div>'+
       '<div class="box"><div class="k">De încasat</div><div class="v" id="dSold">—</div></div>'+
     '</div>'+
+    '<div class="rel"><h3>Link configurator</h3>'+
+      '<div class="muted" style="margin-bottom:10px">Generează un link unic pe care clientul îl deschide pentru a configura cutiile pentru acest proiect.</div>'+
+      '<div class="field full"><label>Nume proiect (opțional)</label><input id="linkProject" type="text" placeholder="ex. Bloc A, Str. Exemplu"></div>'+
+      '<button class="btn btn--primary btn--sm" id="btnGenLink" type="button">Generează link</button>'+
+      '<div id="linkOut" style="margin-top:10px"></div>'+
+    '</div>'+
     '<div class="rel"><h3>Oferte</h3><div class="muted" id="dOffers">Se activează odată cu modulul Oferte.</div></div>';
   detailDrawer(true);
   loadClientFinance(id);
+  $('btnGenLink').addEventListener('click',function(){ genConfigLink(id); });
+}
+async function genConfigLink(clientId){
+  var proj=$('linkProject').value.trim()||null;
+  var token=(Math.random().toString(36).slice(2,9)+Date.now().toString(36)).slice(0,14);
+  var btn=$('btnGenLink'); btn.disabled=true; var t0=btn.textContent; btn.textContent='Se generează…';
+  try{
+    var r=await SB.from('config_links').insert({ token:token, client_id:clientId, project_name:proj, is_active:true }).select().single();
+    if(r.error) throw r.error;
+    var url=location.origin+'/configurator.html?c='+token;
+    $('linkOut').innerHTML='<div class="field full"><label>Link de trimis clientului</label>'+
+      '<input id="linkUrl" type="text" readonly value="'+esc(url)+'" style="width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:13px"></div>'+
+      '<button class="btn btn--ghost btn--sm" id="btnCopyLink" type="button">Copiază linkul</button>';
+    $('btnCopyLink').addEventListener('click',function(){
+      var el=$('linkUrl'); el.select();
+      try{ navigator.clipboard.writeText(el.value); }catch(e){ document.execCommand('copy'); }
+      toast('Link copiat.');
+    });
+    toast('Link generat.');
+  }catch(e){ toast('Eroare: '+(e.message||e),true); }
+  btn.disabled=false; btn.textContent=t0;
+}
+
+/* ---------------- cereri configurator ---------------- */
+function reqDrawer(on){$('reqDetail').classList.toggle('show',on);$('overlay3').classList.toggle('show',on);}
+async function loadRequests(){
+  if(!SB) return;
+  if($('reqBody')) $('reqBody').innerHTML='<tr><td colspan="7" class="empty">Se încarcă…</td></tr>';
+  try{
+    var r=await SB.from('config_requests')
+      .select('id,created_at,project_name,client_id,contact_name,contact_phone,contact_email,material,frame_color,door_color,box_count,omega,avizier_model,status')
+      .order('created_at',{ascending:false});
+    if(r.error) throw r.error;
+    REQUESTS=r.data||[];
+    $('cntReq').textContent=REQUESTS.length;
+    renderRequests();
+  }catch(e){
+    if($('reqBody')) $('reqBody').innerHTML='<tr><td colspan="7" class="empty"><h3>Eroare</h3>'+esc(e.message||String(e))+'</td></tr>';
+  }
+}
+function clientName(cid){ var c=CLIENTS.find(function(x){return x.id===cid;}); return c?c.company_name:''; }
+function renderRequests(){
+  var b=$('reqBody'); if(!b) return;
+  var total=0, nou=0, val=0;
+  REQUESTS.forEach(function(r){ total++; if(r.status!=='procesat')nou++; val+=computePrice(r).gross; });
+  $('stReqTotal').textContent=total; $('stReqNew').textContent=nou; $('stReqValue').textContent=money(val);
+  if(!REQUESTS.length){ b.innerHTML='<tr><td colspan="7" class="empty"><h3>Nicio cerere</h3>Generează un link din fișa unui client și trimite-l.</td></tr>'; return; }
+  b.innerHTML=REQUESTS.map(function(r){
+    var p=computePrice(r);
+    var when=new Date(r.created_at).toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit',year:'2-digit'});
+    var who=[r.project_name,clientName(r.client_id)].filter(Boolean).join(' · ')||r.contact_name||'—';
+    var cfg=(MAT_LABEL[r.material]||r.material||'—')+(r.avizier_model&&r.avizier_model!=='none'?' + '+(AVZ_LABEL[r.avizier_model]||''):'');
+    return '<tr>'+
+      '<td>'+esc(when)+'</td>'+
+      '<td><div class="c-name" data-req="'+r.id+'">'+esc(who)+'</div><div class="c-sub">'+esc(r.contact_name||'')+'</div></td>'+
+      '<td>'+esc(cfg)+'</td>'+
+      '<td>'+esc(r.box_count||0)+'</td>'+
+      '<td>'+money(p.gross)+'</td>'+
+      '<td><span class="tag '+(r.status==='procesat'?'tip-constructor':'tip-dezvoltator')+'">'+(r.status==='procesat'?'Procesat':'Nou')+'</span></td>'+
+      '<td><div class="row-actions"><button class="btn btn--sm btn--ghost" data-req="'+r.id+'">Vezi</button></div></td>'+
+    '</tr>';
+  }).join('');
+  Array.prototype.forEach.call(b.querySelectorAll('[data-req]'),function(el){el.onclick=function(){openRequest(el.getAttribute('data-req'));};});
+}
+async function openRequest(id){
+  currentReqId=id;
+  var r=REQUESTS.find(function(x){return x.id===id;}); if(!r) return;
+  var p=computePrice(r);
+  var body=$('reqBodyDetail');
+  body.innerHTML='<div class="detail-head"><h2>'+esc([r.project_name,clientName(r.client_id)].filter(Boolean).join(' · ')||'Cerere')+'</h2></div>'+
+    '<div id="reqImg" class="muted" style="margin-bottom:14px">Se încarcă vizualizarea…</div>'+
+    '<div class="detail-grid">'+
+      row('Material',MAT_LABEL[r.material]||r.material)+
+      row('Culoare cadru',r.frame_color)+
+      row('Culoare/finisaj ușă',r.door_color)+
+      row('Număr cutii',r.box_count)+
+      row('Profil Omega',r.omega?'Da':'Nu')+
+      row('Avizier',AVZ_LABEL[r.avizier_model]||r.avizier_model||'—')+
+      row('Contact',r.contact_name)+row('Telefon',r.contact_phone)+
+      row('Email',r.contact_email)+row('Status',r.status==='procesat'?'Procesat':'Nou')+
+    '</div>'+
+    '<div class="rel"><h3>Preț intern (calculat)</h3>'+
+      '<div class="detail-grid">'+
+        row('Cutii ('+(r.box_count||0)+' × '+(PRICE[r.material]||0)+')',money(p.boxes))+
+        row('Profil Omega',money(p.omega))+
+        row('Avizier',money(p.avz))+
+        row('Subtotal (fără TVA)',money(p.net))+
+        row('TVA 19%',money(p.vat))+
+      '</div>'+
+      '<div class="fin"><div class="box"><div class="k">Total cu TVA</div><div class="v">'+money(p.gross)+'</div></div></div>'+
+    '</div>';
+  reqDrawer(true);
+  loadRequestImage(id);
+}
+async function loadRequestImage(id){
+  try{
+    var r=await SB.from('config_requests').select('render_b64').eq('id',id).single();
+    var el=$('reqImg'); if(!el) return;
+    if(r.data && r.data.render_b64){ el.innerHTML='<img src="'+r.data.render_b64+'" alt="Vizualizare" style="width:100%;border-radius:14px;border:1px solid var(--line)">'; }
+    else { el.textContent='Fără vizualizare atașată.'; }
+  }catch(e){}
+}
+async function markProcessed(){
+  if(!currentReqId) return;
+  try{
+    var r=await SB.from('config_requests').update({status:'procesat'}).eq('id',currentReqId);
+    if(r.error) throw r.error;
+    reqDrawer(false); toast('Marcat ca procesat.'); await loadRequests();
+  }catch(e){ toast('Eroare: '+(e.message||e),true); }
+}
+async function deleteRequest(){
+  if(!currentReqId) return;
+  if(!confirm('Ștergi definitiv această cerere?')) return;
+  try{
+    var r=await SB.from('config_requests').delete().eq('id',currentReqId);
+    if(r.error) throw r.error;
+    reqDrawer(false); toast('Cerere ștearsă.'); await loadRequests();
+  }catch(e){ toast('Eroare: '+(e.message||e),true); }
 }
 function row(k,v){ if(v==null||v==='') v='—'; return '<div><div class="k">'+k+'</div><div class="v">'+esc(v)+'</div></div>'; }
 async function loadClientFinance(id){
@@ -565,12 +746,13 @@ async function deleteClient(){
 
 /* ---------------- module nav ---------------- */
 function showModule(mod){
-  ['clients','offers','invoices','finance'].forEach(function(m){
+  ['clients','requests','offers','invoices','finance'].forEach(function(m){
     var s=$('mod-'+m); if(s) s.classList.toggle('hidden',m!==mod);
   });
   Array.prototype.forEach.call(document.querySelectorAll('.navlink'),function(b){
     b.classList.toggle('active',b.getAttribute('data-mod')===mod);
   });
+  if(mod==='requests') loadRequests();
 }
 
 /* ---------------- wire up ---------------- */
@@ -589,6 +771,11 @@ function bind(){
   $('overlay2').addEventListener('click',function(){detailDrawer(false);});
   $('btnDelete').addEventListener('click',deleteClient);
   $('btnEditFromDetail').addEventListener('click',function(){detailDrawer(false);openForm(currentDetailId);});
+  $('reqClose').addEventListener('click',function(){reqDrawer(false);});
+  $('overlay3').addEventListener('click',function(){reqDrawer(false);});
+  $('btnReqProcessed').addEventListener('click',markProcessed);
+  $('btnReqDelete').addEventListener('click',deleteRequest);
+  $('btnReloadReq').addEventListener('click',loadRequests);
   Array.prototype.forEach.call(document.querySelectorAll('.navlink'),function(b){
     b.addEventListener('click',function(){
       var mod=b.getAttribute('data-mod');
