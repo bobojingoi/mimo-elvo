@@ -1,4 +1,4 @@
-  // api/render.js — Vercel serverless function
+// api/render.js — Vercel serverless function
 // Primește poza peretelui + specificațiile și cere OpenAI (gpt-image-1.5) o vizualizare.
 // Cheia OpenAI se ia din variabila de mediu OPENAI_API_KEY (setată în Vercel, NU în cod).
 
@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-    const { image, material, frameColor, doorColor, boxCount, avizier } = body;
+    const { image, material, frameColor, doorColor, boxCount, avizier, finish } = body;
     if (!image) return res.status(400).json({ error: 'Lipsește imaginea peretelui.' });
 
     const m = String(image).match(/^data:(image\/\w+);base64,(.+)$/);
@@ -22,13 +22,13 @@ module.exports = async (req, res) => {
     const mime = m[1];
     const buf = Buffer.from(m[2], 'base64');
 
-    const prompt = buildPrompt({ material, frameColor, doorColor, boxCount, avizier });
+    const prompt = buildPrompt({ material, frameColor, doorColor, boxCount, avizier, finish });
 
     const form = new FormData();
     form.append('model', 'gpt-image-1.5');
     form.append('prompt', prompt);
     form.append('input_fidelity', 'high');
-    form.append('quality', 'medium');
+    form.append('quality', 'high');
     form.append('size', 'auto');
     form.append('output_format', 'jpeg');
     form.append('image[]', new Blob([buf], { type: mime }), 'perete.jpg');
@@ -60,15 +60,31 @@ function buildPrompt(o) {
   if (n > 300) n = 300;
   var mat;
   if (o.material === 'inox') {
-    mat = 'mailbox doors in brushed stainless steel (satin inox), set in a powder-coated steel frame in ' + nameOf(o.frameColor) + ', with small laser-cut apartment numbers on each door';
+    mat = 'a wall-mounted mailbox bank with brushed stainless-steel (satin inox) doors set in a powder-coated steel frame in ' + nameOf(o.frameColor) + ', with small laser-cut apartment numbers on each door';
   } else if (o.material === 'lacobel') {
-    mat = 'mailbox front doors made of glossy Lacobel glass in ' + nameOf(o.doorColor) + ' colour, in a slim metal frame in ' + nameOf(o.frameColor) + ', with sandblasted apartment numbers on the glass';
+    mat = 'a wall-mounted mailbox bank with glossy Lacobel glass front doors in ' + nameOf(o.doorColor) + ' colour, in a slim metal frame in ' + nameOf(o.frameColor) + ', with sandblasted apartment numbers on the glass';
   } else {
-    mat = 'powder-coated steel mailboxes with a matte finish, doors painted ' + nameOf(o.doorColor) + ' and body/frame in ' + nameOf(o.frameColor) + ', with small laser-cut apartment numbers on each door';
+    mat = 'a wall-mounted mailbox bank of powder-coated steel with a matte finish, doors painted ' + nameOf(o.doorColor) + ' and body/frame in ' + nameOf(o.frameColor) + ', with small laser-cut apartment numbers on each door';
   }
-  var p = 'Edit this photo of a real interior wall in a residential building lobby. Keep the wall, floor, ceiling, lighting, shadows and camera perspective EXACTLY the same. Add one realistic, professionally installed wall-mounted mailbox bank: ' + mat + '. Arrange about ' + n + ' identical rectangular mailboxes in a clean, perfectly aligned grid of rows and columns, each door roughly 33 cm wide and 13 cm tall, mounted flat on the wall at about chest height, all edges aligned. Make it look photorealistic and seamlessly integrated with the existing wall. No text, no watermark, no people.';
+
+  // Finisaj ambiental (opțional). Implicit: auto premium, ales de model.
+  var finishMap = {
+    marmura: 'large-format light marble-look wall cladding in warm ivory and beige tones',
+    piatra:  'large-format matte anthracite stone / porcelain wall cladding in dark charcoal tones',
+    lemn:    'warm wood-slat (riflaj) wall panelling in a natural oak tone combined with matte neutral plaster',
+    minimalist: 'smooth matte off-white micro-cement walls with a clean minimalist look'
+  };
+  var finish = finishMap[o.finish] || 'an elegant, cohesive premium finish that best suits the space (for example large-format stone or marble-look cladding in warm neutral tones, optionally combined with wood-slat accents)';
+
+  var p =
+    'This photo shows a residential building lobby / entrance hall during construction, with raw unfinished surfaces (green moisture-resistant drywall, exposed gypsum board, bare concrete, cables, protective sheeting on the floor). ' +
+    'Produce a photorealistic "after renovation" visualization of the SAME space, fully finished and elegant. ' +
+    'CRITICAL — preserve the architecture and geometry EXACTLY as in the photo: keep the same wall positions, the same columns, pilasters and niches/recesses, the same ceiling height and floor level, and the exact same camera angle and perspective. Do NOT move, add, remove, bend, straighten or reshape any structural element. The shape of the space must stay identical. ' +
+    'Change ONLY the surface finishes and add the mailboxes: replace the raw drywall, concrete and clutter with ' + finish + ', add tasteful warm-white LED accent lighting in the vertical recesses between the columns, and a clean finished stone or polished-concrete floor. The design around the mailboxes must look intentional, harmonious and high-end. ' +
+    'Cleanly install ' + mat + ' on the main wall surface. Arrange about ' + n + ' identical rectangular mailboxes in a neat, perfectly aligned grid of rows and columns, each door roughly 33 cm wide and 13 cm tall, mounted flat at chest height, all edges aligned, fully integrated with the surrounding finish. ' +
+    'Photorealistic, with natural lighting and shadows consistent with the space. No text, no watermark, no people, no tools or clutter.';
   if (o.avizier && o.avizier !== 'none') {
-    p += ' On the same wall, aligned next to the mailboxes, also add a matching black metal notice board (avizier) with a glass front for posting building notices.';
+    p += ' On the same wall, aligned next to the mailboxes, also install a matching black-framed metal notice board (avizier) with a glass front, integrated into the finished design.';
   }
   return p;
 }
