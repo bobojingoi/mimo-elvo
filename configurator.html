@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurator cutii poștale — MIMO ELVO</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+:root{
+  --paper:#F4F0E9;--paper-2:#EDE7DC;--stone:#E2D9CC;--ink:#1C1916;--black:#15120E;
+  --bronze:#B08A5B;--champagne:#C9A877;--muted:#6B6155;--muted-light:#A99E8F;
+  --line:rgba(28,25,22,.14);--danger:#b9573f;
+  --serif:'Cormorant Garamond',Georgia,serif;--sans:'Hanken Grotesk',system-ui,sans-serif;--ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.08}
+img{display:block;max-width:100%}
+.wrap{max-width:680px;margin:0 auto;padding:0 18px 120px}
+
+/* header */
+.top{background:var(--black);color:var(--paper);padding:22px 18px;text-align:center}
+.top .brand{font-family:var(--serif);font-size:1.6rem;font-weight:600}
+.top .brand span{color:var(--bronze)}
+.top .sub{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-light);margin-top:6px}
+
+.hero{padding:30px 0 8px}
+.hero .eyebrow{font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--bronze)}
+.hero h1{font-size:clamp(1.9rem,6vw,2.6rem);margin:12px 0 10px}
+.hero p{color:var(--muted);max-width:52ch}
+
+/* step block */
+.step{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:18px;box-shadow:0 2px 12px rgba(28,20,12,.05)}
+.step__n{display:inline-flex;align-items:center;gap:9px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted-light)}
+.step__n b{width:24px;height:24px;border-radius:100px;background:var(--bronze);color:var(--black);display:grid;place-items:center;font-family:var(--serif);font-size:14px}
+.step h2{font-size:1.5rem;margin:12px 0 4px}
+.step .hint{color:var(--muted-light);font-size:13px;margin-bottom:16px}
+
+/* photo */
+.photo-drop{border:1px dashed var(--line);border-radius:16px;padding:26px;text-align:center;cursor:pointer;transition:.25s}
+.photo-drop:hover{border-color:var(--bronze);background:var(--paper-2)}
+.photo-drop svg{width:34px;height:34px;stroke:var(--bronze);fill:none;stroke-width:1.4;margin-bottom:10px}
+.photo-drop .big{font-weight:600}
+.photo-drop .small{font-size:12.5px;color:var(--muted-light);margin-top:4px}
+.photo-drop input{display:none}
+.preview{position:relative;border-radius:16px;overflow:hidden;margin-top:6px}
+.preview img{width:100%;max-height:340px;object-fit:cover}
+.preview .change{position:absolute;bottom:12px;right:12px;background:rgba(15,13,10,.7);color:#fff;border:0;border-radius:100px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer}
+
+/* option cards */
+.opts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.opt{border:1px solid var(--line);border-radius:14px;padding:14px 12px;text-align:center;cursor:pointer;background:#fff;transition:.2s}
+.opt:hover{border-color:var(--bronze)}
+.opt.sel{border-color:var(--bronze);background:var(--paper-2);box-shadow:inset 0 0 0 1px var(--bronze)}
+.opt .t{font-weight:600;font-size:14px}
+.opt .d{font-size:11.5px;color:var(--muted-light);margin-top:3px}
+@media(max-width:520px){.opts{grid-template-columns:1fr 1fr}}
+
+/* swatches */
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.sw{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;width:72px}
+.sw .dot{width:46px;height:46px;border-radius:12px;border:2px solid transparent;box-shadow:0 0 0 1px var(--line) inset;transition:.2s}
+.sw.sel .dot{border-color:var(--bronze);box-shadow:0 0 0 2px var(--bronze)}
+.sw .lbl{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.2}
+.fixed-note{background:var(--paper-2);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted)}
+
+/* number */
+.counter{display:flex;align-items:center;gap:14px}
+.counter button{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:22px;color:var(--ink);cursor:pointer}
+.counter button:hover{border-color:var(--bronze)}
+.counter input{width:90px;text-align:center;font-size:22px;font-family:var(--serif);padding:10px;border:1px solid var(--line);border-radius:12px}
+
+/* fields */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.field input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:15px}
+.field input:focus{outline:none;border-color:var(--bronze)}
+
+/* result */
+.result{margin-top:18px}
+.result img{width:100%;border-radius:16px;border:1px solid var(--line)}
+.loading{background:#fff;border:1px solid var(--line);border-radius:20px;padding:40px 22px;text-align:center;margin-top:18px}
+.spinner{width:38px;height:38px;border:3px solid var(--paper-2);border-top-color:var(--bronze);border-radius:100px;margin:0 auto 16px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{color:var(--muted)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:100px;padding:16px;border:1px solid transparent;cursor:pointer;transition:.25s}
+.btn--primary{background:var(--bronze);color:var(--black)}
+.btn--primary:hover{background:var(--champagne)}
+.btn--primary:disabled{opacity:.5;cursor:not-allowed}
+.btn--ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.btn--ghost:hover{border-color:var(--bronze)}
+.stack{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.msg{font-size:13px;color:var(--danger);margin-top:10px;min-height:1em;text-align:center}
+.note{font-size:12px;color:var(--muted-light);text-align:center;margin-top:8px}
+
+/* success / states */
+.center{max-width:520px;margin:60px auto;text-align:center;padding:0 18px}
+.center h1{font-size:2.2rem;margin-bottom:12px}
+.center p{color:var(--muted)}
+.hidden{display:none!important}
+.foot{text-align:center;color:var(--muted-light);font-size:12px;padding:30px 18px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">MIMO<span>·</span>ELVO</div>
+  <div class="sub">Configurator cutii poștale</div>
+</div>
+
+<!-- STARE: link invalid -->
+<div id="stateInvalid" class="center hidden">
+  <h1>Link indisponibil</h1>
+  <p>Acest link nu este valid sau a fost dezactivat. Contactează-ne la <b>office@mimoelvo.com</b> sau <b>0744 525 259</b> și îți trimitem unul nou.</p>
+</div>
+
+<!-- STARE: succes -->
+<div id="stateDone" class="center hidden">
+  <h1>Cererea a fost trimisă</h1>
+  <p>Îți mulțumim! Am primit configurația și vizualizarea. Revenim în cel mai scurt timp cu o propunere adaptată proiectului tău.</p>
+</div>
+
+<!-- CONFIGURATOR -->
+<div id="stateMain" class="wrap hidden">
+  <div class="hero">
+    <span class="eyebrow" id="greetEyebrow">Proiectul tău</span>
+    <h1>Configurează cutiile poștale pentru lobby-ul tău</h1>
+    <p>Fă o poză peretelui, alege materialul și culorile, iar noi îți generăm o vizualizare pe peretele tău real.</p>
+  </div>
+
+  <!-- 1. Poza -->
+  <div class="step">
+    <span class="step__n"><b>1</b> Poza peretelui</span>
+    <h2>Fotografiază zona de acces</h2>
+    <p class="hint">Poziționează-te frontal, cu tot peretele în cadru și lumină bună.</p>
+    <label class="photo-drop" id="photoDrop">
+      <svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v13H4z"/><circle cx="12" cy="13" r="4"/></svg>
+      <div class="big">Adaugă o poză</div>
+      <div class="small">Fă o fotografie sau alege din galerie</div>
+      <input id="photoInput" type="file" accept="image/*" capture="environment">
+    </label>
+    <div class="preview hidden" id="preview">
+      <img id="previewImg" alt="Peretele tău">
+      <button class="change" id="changePhoto">Schimbă poza</button>
+    </div>
+  </div>
+
+  <!-- 2. Material -->
+  <div class="step">
+    <span class="step__n"><b>2</b> Material ușă</span>
+    <h2>Alege tipul cutiei</h2>
+    <p class="hint">Fiecare are un aspect diferit al ușii.</p>
+    <div class="opts" id="materialOpts">
+      <div class="opt" data-mat="metalica"><div class="t">Metalică</div><div class="d">Vopsită RAL</div></div>
+      <div class="opt" data-mat="inox"><div class="t">Inox</div><div class="d">Ușă inox satinat</div></div>
+      <div class="opt" data-mat="lacobel"><div class="t">Sticlă Lacobel</div><div class="d">Ușă din sticlă</div></div>
+    </div>
+  </div>
+
+  <!-- 3. Culori -->
+  <div class="step">
+    <span class="step__n"><b>3</b> Culori</span>
+    <h2>Alege finisajele</h2>
+    <p class="hint">Culoarea cadrului și a ușii.</p>
+    <div class="field"><label>Culoare cadru</label><div class="swatches" id="frameSwatches"></div></div>
+    <div class="field"><label id="doorLabel">Culoare / finisaj ușă</label>
+      <div class="swatches" id="doorSwatches"></div>
+      <div class="fixed-note hidden" id="doorFixed">Ușa este din <b>inox satinat</b> (finisaj standard).</div>
+    </div>
+  </div>
+
+  <!-- 4. Număr cutii -->
+  <div class="step">
+    <span class="step__n"><b>4</b> Număr de cutii</span>
+    <h2>Câte apartamente?</h2>
+    <p class="hint">Numărul de cutii poștale necesare.</p>
+    <div class="counter">
+      <button type="button" id="minus">−</button>
+      <input id="boxCount" type="number" min="1" max="300" value="12">
+      <button type="button" id="plus">+</button>
+    </div>
+  </div>
+
+  <!-- 5. Avizier -->
+  <div class="step">
+    <span class="step__n"><b>5</b> Avizier <span style="color:var(--muted-light);text-transform:none;letter-spacing:0;font-weight:500">(opțional)</span></span>
+    <h2>Adaugi și avizier?</h2>
+    <p class="hint">Avizierul se montează de obicei lângă cutii, cu același aspect.</p>
+    <div class="opts" id="avizierOpts">
+      <div class="opt sel" data-av="none"><div class="t">Fără</div></div>
+      <div class="opt" data-av="avizier_1"><div class="t">Avizier 1</div><div class="d">ADM</div></div>
+      <div class="opt" data-av="avizier_2"><div class="t">Avizier 2</div><div class="d">ADM + Pub</div></div>
+      <div class="opt" data-av="avizier_3"><div class="t">Avizier 3</div><div class="d">ADM + 2 Pub</div></div>
+    </div>
+  </div>
+
+  <!-- 6. Generare -->
+  <div class="step">
+    <span class="step__n"><b>6</b> Vizualizare</span>
+    <h2>Vezi cum ar arăta la tine</h2>
+    <p class="hint">Generăm o imagine orientativă pe peretele tău.</p>
+    <button class="btn btn--primary" id="btnGenerate" disabled>Generează vizualizarea</button>
+    <div class="note" id="genNote">Adaugă întâi o poză și alege materialul.</div>
+    <div class="loading hidden" id="loading">
+      <div class="spinner"></div>
+      <p>Se generează vizualizarea… poate dura până la un minut.</p>
+    </div>
+    <div class="result hidden" id="result">
+      <img id="resultImg" alt="Vizualizare">
+      <div class="stack">
+        <button class="btn btn--ghost" id="btnRegen">Regenerează</button>
+      </div>
+      <div class="note" id="regenNote"></div>
+    </div>
+    <div class="msg" id="genMsg"></div>
+  </div>
+
+  <!-- 7. Contact + trimitere -->
+  <div class="step">
+    <span class="step__n"><b>7</b> Trimite cererea</span>
+    <h2>Datele tale de contact</h2>
+    <p class="hint">Ca să putem reveni cu o propunere.</p>
+    <div class="field"><label>Nume și prenume</label><input id="cName" type="text" placeholder="Nume Prenume"></div>
+    <div class="field"><label>Telefon</label><input id="cPhone" type="tel" placeholder="+40 7xx xxx xxx"></div>
+    <div class="field"><label>Email</label><input id="cEmail" type="email" placeholder="email@exemplu.ro"></div>
+    <button class="btn btn--primary" id="btnSubmit">Trimite cererea</button>
+    <div class="msg" id="submitMsg"></div>
+  </div>
+
+  <div class="foot">MIMO &amp; ELVO GRUP S.R.L. · office@mimoelvo.com · 0744 525 259</div>
+</div>
+
+<script>
+"use strict";
+function $(id){return document.getElementById(id);}
+var SB=null;
+try{var c=window.SB_CONFIG;if(c&&c.url&&c.anonKey&&c.url.indexOf('YOUR')===-1&&window.supabase){SB=window.supabase.createClient(c.url,c.anonKey);}}catch(e){}
+
+var TOKEN=new URLSearchParams(location.search).get('c')||new URLSearchParams(location.search).get('p')||'';
+var S={ token:TOKEN, photo:null, material:null, frameColor:null, doorColor:null, boxCount:12, avizier:'none', render:null, genCount:0 };
+
+var RAL=[
+ {name:'Alb 9010',hex:'#f1f0ea'},{name:'Negru 9005',hex:'#0d0d0d'},
+ {name:'Gri Antracit 7016',hex:'#383e42'},{name:'Crem 1013',hex:'#e6ddca'},
+ {name:'Gri 7040',hex:'#9ea3a6'},{name:'Maro 8017',hex:'#43312a'},
+ {name:'Champagne',hex:'#b08a5b'}
+];
+var LACOBEL=[
+ {name:'Negru',hex:'#0d0d0d'},{name:'Alb',hex:'#f4f2ec'},{name:'Crem',hex:'#e6ddca'},
+ {name:'Gri Antracit',hex:'#383e42'},{name:'Oglindă Normală',hex:'#b9c1c4'},
+ {name:'Oglindă Fumurie',hex:'#6f6a63'},{name:'Oglindă Argintie',hex:'#cfd3d6'},
+ {name:'Oglindă Antichizată',hex:'#8a7c63'}
+];
+
+/* ---------- boot: verifică tokenul ---------- */
+async function boot(){
+  if(!SB || !S.token){ show('stateInvalid'); return; }
+  try{
+    var r=await SB.rpc('get_config_context',{p_token:S.token});
+    if(r.error || !r.data || !r.data.length){ show('stateInvalid'); return; }
+    var ctx=r.data[0];
+    var label=[ctx.company_name, ctx.project_name].filter(Boolean).join(' · ');
+    if(label) $('greetEyebrow').textContent=label;
+    show('stateMain');
+    initUI();
+  }catch(e){ show('stateInvalid'); }
+}
+function show(id){ ['stateInvalid','stateDone','stateMain'].forEach(function(s){ $(s).classList.toggle('hidden', s!==id); }); }
+
+/* ---------- UI ---------- */
+function initUI(){
+  // foto
+  $('photoInput').addEventListener('change',onPhoto);
+  $('changePhoto').addEventListener('click',function(){$('photoInput').click();});
+  // material
+  Array.prototype.forEach.call($('materialOpts').children,function(el){
+    el.addEventListener('click',function(){ selectOne('materialOpts',el); S.material=el.getAttribute('data-mat'); buildDoorSwatches(); refreshGen(); });
+  });
+  // avizier
+  Array.prototype.forEach.call($('avizierOpts').children,function(el){
+    el.addEventListener('click',function(){ selectOne('avizierOpts',el); S.avizier=el.getAttribute('data-av'); });
+  });
+  // counter
+  $('minus').addEventListener('click',function(){ setCount(S.boxCount-1); });
+  $('plus').addEventListener('click',function(){ setCount(S.boxCount+1); });
+  $('boxCount').addEventListener('input',function(){ setCount(parseInt($('boxCount').value,10)||1); });
+  // swatches
+  buildSwatches('frameSwatches',RAL,function(c){S.frameColor=c;});
+  buildDoorSwatches();
+  // actions
+  $('btnGenerate').addEventListener('click',generate);
+  $('btnRegen').addEventListener('click',generate);
+  $('btnSubmit').addEventListener('click',submit);
+}
+function selectOne(wrapId,el){ Array.prototype.forEach.call($(wrapId).children,function(c){c.classList.remove('sel');}); el.classList.add('sel'); }
+function setCount(n){ if(!(n>0))n=1; if(n>300)n=300; S.boxCount=n; $('boxCount').value=n; }
+
+function buildSwatches(wrapId,list,onPick){
+  var wrap=$(wrapId); wrap.innerHTML='';
+  list.forEach(function(col){
+    var d=document.createElement('div'); d.className='sw';
+    d.innerHTML='<div class="dot" style="background:'+col.hex+'"></div><div class="lbl">'+col.name+'</div>';
+    d.addEventListener('click',function(){
+      Array.prototype.forEach.call(wrap.children,function(c){c.classList.remove('sel');});
+      d.classList.add('sel'); onPick(col.name);
+    });
+    wrap.appendChild(d);
+  });
+}
+function buildDoorSwatches(){
+  var fixed=$('doorFixed'), wrap=$('doorSwatches'), lbl=$('doorLabel');
+  if(S.material==='inox'){
+    wrap.classList.add('hidden'); fixed.classList.remove('hidden');
+    lbl.textContent='Finisaj ușă'; S.doorColor='Inox satinat';
+  } else if(S.material==='lacobel'){
+    fixed.classList.add('hidden'); wrap.classList.remove('hidden');
+    lbl.textContent='Culoare sticlă Lacobel'; S.doorColor=null;
+    buildSwatches('doorSwatches',LACOBEL,function(c){S.doorColor=c;});
+  } else {
+    fixed.classList.add('hidden'); wrap.classList.remove('hidden');
+    lbl.textContent='Culoare ușă (RAL)'; S.doorColor=null;
+    buildSwatches('doorSwatches',RAL,function(c){S.doorColor=c;});
+  }
+}
+
+/* ---------- foto + resize ---------- */
+function onPhoto(){
+  var f=$('photoInput').files && $('photoInput').files[0]; if(!f) return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var max=1280, w=img.width, h=img.height;
+      if(Math.max(w,h)>max){ var k=max/Math.max(w,h); w=Math.round(w*k); h=Math.round(h*k); }
+      var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      S.photo=cv.toDataURL('image/jpeg',0.85);
+      $('previewImg').src=S.photo;
+      $('preview').classList.remove('hidden');
+      $('photoDrop').classList.add('hidden');
+      refreshGen();
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(f);
+}
+
+function refreshGen(){
+  var ok=S.photo && S.material;
+  $('btnGenerate').disabled=!ok;
+  $('genNote').textContent = ok ? 'Gata de generat.' : 'Adaugă întâi o poză și alege materialul.';
+}
+
+/* ---------- generare AI ---------- */
+async function generate(){
+  if(!S.photo || !S.material) return;
+  $('genMsg').textContent='';
+  $('loading').classList.remove('hidden');
+  $('result').classList.add('hidden');
+  $('btnGenerate').disabled=true; $('btnRegen').disabled=true;
+  try{
+    var resp=await fetch('/api/render',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ image:S.photo, material:S.material, frameColor:S.frameColor, doorColor:S.doorColor, boxCount:S.boxCount, avizier:S.avizier })
+    });
+    var data=await resp.json();
+    if(!resp.ok){ throw new Error(data.error||('Eroare '+resp.status)); }
+    S.render=data.image; S.genCount++;
+    $('resultImg').src=S.render;
+    $('result').classList.remove('hidden');
+    var left=3-S.genCount;
+    $('regenNote').textContent = left>0 ? ('Poți regenera de încă '+left+' ori.') : 'Ai atins limita de regenerări.';
+    $('btnRegen').disabled = left<=0;
+  }catch(e){
+    $('genMsg').textContent='Nu am putut genera imaginea: '+(e.message||e);
+  }
+  $('loading').classList.add('hidden');
+  $('btnGenerate').disabled=false;
+}
+
+/* ---------- trimitere ---------- */
+async function submit(){
+  var name=$('cName').value.trim(), phone=$('cPhone').value.trim(), email=$('cEmail').value.trim();
+  $('submitMsg').style.color='var(--danger)';
+  if(!name || (!phone && !email)){ $('submitMsg').textContent='Completează numele și cel puțin telefon sau email.'; return; }
+  var btn=$('btnSubmit'); btn.disabled=true; var t0=btn.textContent; btn.textContent='Se trimite…';
+  try{
+    var r=await SB.rpc('submit_config_request',{
+      p_token:S.token, p_contact_name:name, p_contact_phone:phone, p_contact_email:email,
+      p_material:S.material, p_frame_color:S.frameColor, p_door_color:S.doorColor,
+      p_box_count:S.boxCount, p_omega:false, p_avizier_model:S.avizier,
+      p_render_b64:S.render||null, p_notes:null
+    });
+    if(r.error) throw r.error;
+    show('stateDone'); window.scrollTo(0,0);
+  }catch(e){
+    $('submitMsg').textContent='Trimitere eșuată: '+(e.message||e);
+    btn.disabled=false; btn.textContent=t0;
+  }
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+</script>
+</body>
+</html>
