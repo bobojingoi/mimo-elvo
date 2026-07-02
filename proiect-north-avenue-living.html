@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>North Avenue Living — Proiect · Nume Brand</title>
+<meta name="description" content="Soluție modulară pentru un ansamblu rezidențial cu mai multe scări. Studiu de caz: North Avenue Living, Brașov.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --paper:#F4F0E9;
+  --paper-2:#EDE7DC;
+  --stone:#E2D9CC;
+  --charcoal:#2A2620;
+  --ink:#1C1916;
+  --black:#15120E;
+  --bronze:#B08A5B;
+  --champagne:#C9A877;
+  --muted:#6B6155;
+  --muted-light:#A99E8F;
+  --line-dark:rgba(255,255,255,.12);
+  --line-light:rgba(28,25,22,.14);
+
+  --serif:'Cormorant Garamond', Georgia, serif;
+  --sans:'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --maxw:1280px;
+  --gut:clamp(20px,5vw,72px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+/* ============================================================
+   RESET / BASE
+   ============================================================ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  font-weight:400;
+  line-height:1.62;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+::selection{background:var(--bronze);color:var(--black)}
+
+h1,h2,h3,h4{font-family:var(--serif);font-weight:500;line-height:1.04;letter-spacing:-.01em}
+
+/* ============================================================
+   TYPOGRAPHIC UTILITIES
+   ============================================================ */
+.eyebrow{
+  font-family:var(--sans);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--bronze);
+  display:inline-block;
+}
+.eyebrow--muted{color:var(--muted)}
+.display-xl{font-size:clamp(2.6rem,6.2vw,5.4rem)}
+.display-l{font-size:clamp(2.2rem,4.6vw,3.9rem)}
+.display-m{font-size:clamp(1.9rem,3.3vw,2.9rem)}
+.lead{font-size:clamp(1.05rem,1.5vw,1.25rem);line-height:1.6;color:var(--muted)}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gut)}
+.section{padding-block:clamp(72px,9vw,128px)}
+.section--tight{padding-block:clamp(56px,6vw,88px)}
+.bg-paper{background:var(--paper)}
+.bg-stone{background:var(--paper-2)}
+.bg-dark{background:var(--ink);color:var(--paper)}
+.bg-black{background:var(--black);color:var(--paper)}
+.rule{height:1px;background:var(--line-light);border:0}
+.bg-dark .rule,.bg-black .rule{background:var(--line-dark)}
+
+/* Editorial 3-column intro motif (the signature structural device) */
+.intro{
+  display:grid;
+  grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);
+  gap:clamp(28px,5vw,64px);
+  align-items:end;
+}
+.intro__eyebrow{margin-bottom:22px}
+.intro__support{padding-bottom:8px}
+
+/* ============================================================
+   MATERIAL PANELS (photographic slots + guaranteed fallback)
+   ============================================================ */
+.frame{position:relative;overflow:hidden;background:var(--charcoal)}
+.frame img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:2;
+  transition:transform 1.1s var(--ease), opacity .8s ease;
+}
+.frame::after{ /* subtle photographic vignette */
+  content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.28));
+}
+/* hand-built material backgrounds (layer 1, always visible) */
+.m-smoke{background:
+  radial-gradient(120% 90% at 30% 20%,#3a342c 0%,#211d18 55%,#0f0d0a 100%)}
+.m-metal{background:
+  repeating-linear-gradient(95deg,#2f2a23 0 2px,#3b352c 2px 3px,#262219 3px 6px),
+  linear-gradient(180deg,#46402f,#23201a)}
+.m-rib{background:
+  repeating-linear-gradient(90deg,#2c281f 0 9px,#1d1a14 9px 12px,#39342a 12px 14px)}
+.m-stone{background:
+  radial-gradient(80% 70% at 20% 15%,#d9cdb8 0%,#c7b89c 50%,#b3a487 100%)}
+.m-wood{background:
+  repeating-linear-gradient(91deg,#6a4a2c 0 6px,#5c3f25 6px 11px,#73522f 11px 15px),
+  linear-gradient(180deg,#6f4e2e,#4a3320)}
+.m-bronze{background:
+  linear-gradient(120deg,#e7cda0 0%,#c9a877 28%,#a07a4c 52%,#d8bd92 74%,#b08a5b 100%)}
+.m-glass{background:
+  linear-gradient(135deg,#23262b 0%,#15171b 45%,#0c0d10 100%)}
+.m-ral{background:
+  linear-gradient(135deg,#7a6f5f 0%,#3f3a32 100%)}
+.m-pvc{background:
+  repeating-linear-gradient(45deg,#2a2620 0 7px,#221e18 7px 14px)}
+.m-laser{background:
+  radial-gradient(60% 60% at 70% 30%,#cdb083 0%,#a07a4c 60%,#2a2018 100%)}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;gap:.7em;
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:16px 26px;border:1px solid transparent;
+  transition:background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease);
+}
+.btn .arrow{transition:transform .4s var(--ease)}
+.btn:hover .arrow{transform:translateX(5px)}
+.btn--solid{background:var(--bronze);color:var(--black)}
+.btn--solid:hover{background:var(--champagne)}
+.btn--outline{border-color:currentColor;color:inherit}
+.btn--outline:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.bg-dark .btn--outline:hover,.bg-black .btn--outline:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.btn--ghost{padding-inline:0;color:var(--bronze)}
+.link-arrow{
+  font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--bronze);
+  display:inline-flex;align-items:center;gap:.6em;
+}
+.link-arrow .arrow{transition:transform .4s var(--ease)}
+.link-arrow:hover .arrow{transform:translateX(5px)}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header{
+  position:fixed;inset:0 0 auto;z-index:100;
+  transition:background .5s var(--ease),box-shadow .5s var(--ease),padding .5s var(--ease);
+  padding-block:22px;
+}
+.header__inner{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{font-family:var(--serif);font-size:1.6rem;font-weight:600;letter-spacing:.01em;color:var(--paper);transition:color .5s var(--ease)}
+.brand span{color:var(--bronze)}
+.nav{display:flex;align-items:center;gap:clamp(18px,2.2vw,34px)}
+.nav a{
+  font-size:13px;font-weight:500;letter-spacing:.04em;color:var(--paper);
+  position:relative;padding-block:6px;transition:color .4s var(--ease);
+}
+.nav a::after{
+  content:"";position:absolute;left:0;bottom:0;height:1px;width:0;
+  background:var(--bronze);transition:width .4s var(--ease);
+}
+.nav a:hover::after,.nav a:focus-visible::after{width:100%}
+.header__cta .btn--solid{padding:12px 22px}
+
+/* scrolled state */
+.header.scrolled{
+  background:rgba(244,240,233,.92);
+  backdrop-filter:saturate(120%) blur(14px);
+  -webkit-backdrop-filter:saturate(120%) blur(14px);
+  box-shadow:0 1px 0 var(--line-light);
+  padding-block:14px;
+}
+.header.scrolled .brand,.header.scrolled .nav a{color:var(--ink)}
+
+.nav-toggle{display:none;flex-direction:column;gap:5px;padding:8px}
+.nav-toggle span{width:24px;height:1.5px;background:var(--paper);transition:.4s var(--ease)}
+.header.scrolled .nav-toggle span{background:var(--ink)}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;color:var(--paper);isolation:isolate}
+.hero__media{position:absolute;inset:0;z-index:-1}
+.hero__media .frame{position:absolute;inset:0}
+.hero__media::after{
+  content:"";position:absolute;inset:0;z-index:4;
+  background:
+    linear-gradient(90deg,rgba(8,7,5,.82) 0%,rgba(8,7,5,.55) 42%,rgba(8,7,5,.12) 78%),
+    linear-gradient(180deg,rgba(8,7,5,.55),rgba(8,7,5,.2) 30%,rgba(8,7,5,.35));
+}
+.hero__inner{padding-top:120px;padding-bottom:60px;max-width:920px}
+.hero h1{margin:24px 0 28px;max-width:14ch}
+.hero__sub{max-width:52ch;color:rgba(244,240,233,.82);font-size:clamp(1.05rem,1.55vw,1.3rem);line-height:1.55}
+.hero__actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:40px}
+.hero__trust{
+  display:flex;align-items:center;gap:14px;margin-top:54px;
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,240,233,.7);
+}
+.hero__trust .dash{width:42px;height:1px;background:var(--bronze)}
+
+/* ============================================================
+   SECTION 2 — Statement + annotated lobby
+   ============================================================ */
+.statement__grid{
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:clamp(32px,5vw,72px);align-items:start;
+}
+.statement__lead{margin-top:26px;font-size:clamp(1.05rem,1.5vw,1.22rem);color:var(--muted)}
+.statement__support{margin-top:22px;color:var(--muted)}
+.annotated{position:relative;margin-top:clamp(48px,6vw,80px)}
+.annotated .frame{aspect-ratio:21/9;width:100%}
+@media(max-width:760px){.annotated .frame{aspect-ratio:4/5}}
+
+/* corner-bracket callouts — the visual signature */
+.callout{
+  position:absolute;z-index:6;
+  font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--paper);
+  padding:8px 11px;border:1px solid rgba(244,240,233,.55);
+  background:rgba(15,13,10,.35);backdrop-filter:blur(3px);
+  white-space:nowrap;
+  opacity:0;transform:translateY(8px);
+  transition:opacity .6s var(--ease),transform .6s var(--ease);
+}
+.annotated.in .callout{opacity:1;transform:translateY(0)}
+.annotated.in .callout:nth-child(2){transition-delay:.15s}
+.annotated.in .callout:nth-child(3){transition-delay:.25s}
+.annotated.in .callout:nth-child(4){transition-delay:.35s}
+.annotated.in .callout:nth-child(5){transition-delay:.45s}
+.annotated.in .callout:nth-child(6){transition-delay:.55s}
+.annotated.in .callout:nth-child(7){transition-delay:.65s}
+.callout::before{ /* bracket tick */
+  content:"";position:absolute;width:7px;height:7px;border:1px solid var(--bronze);
+}
+.callout.tl{top:10%;left:6%}
+.callout.tr{top:16%;right:8%}
+.callout.ml{top:46%;left:10%}
+.callout.mr{top:52%;right:12%}
+.callout.bl{bottom:14%;left:7%}
+.callout.bm{bottom:10%;left:46%}
+.callout.br{bottom:20%;right:9%}
+
+/* ============================================================
+   SECTION 3 — What we design (grid)
+   ============================================================ */
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-light);margin-top:clamp(40px,5vw,64px);border:1px solid var(--line-light)}
+.cat{position:relative;background:var(--paper);display:block;overflow:hidden}
+.cat .frame{aspect-ratio:4/5;width:100%}
+.cat__body{padding:22px 24px 26px}
+.cat__num{font-size:12px;letter-spacing:.1em;color:var(--bronze);font-weight:600}
+.cat h3{font-size:1.45rem;margin:8px 0 7px}
+.cat p{font-size:.92rem;line-height:1.5;color:var(--muted)}
+.cat .frame img{transition:transform 1.1s var(--ease)}
+.cat:hover .frame img{transform:scale(1.06)}
+.cat::before{
+  content:"";position:absolute;left:0;top:0;height:2px;width:0;background:var(--bronze);z-index:5;
+  transition:width .5s var(--ease);
+}
+.cat:hover::before{width:100%}
+
+/* ============================================================
+   SECTION 4 — Projects (case studies)
+   ============================================================ */
+.projects{display:grid;gap:clamp(40px,5vw,72px);margin-top:clamp(40px,5vw,64px)}
+.project{
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+  gap:clamp(28px,4vw,56px);align-items:center;
+}
+.project:nth-child(even){direction:rtl}
+.project:nth-child(even)>*{direction:ltr}
+.project .frame{aspect-ratio:16/11;width:100%}
+.project .frame img{transition:transform 1.2s var(--ease)}
+.project:hover .frame img{transform:scale(1.04)}
+.project__meta{display:flex;align-items:baseline;gap:16px;margin-bottom:14px}
+.project__index{font-family:var(--serif);font-size:2.4rem;color:var(--bronze);line-height:1}
+.project__tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.project h3{font-size:clamp(1.9rem,2.8vw,2.6rem);margin-bottom:10px}
+.project__desc{color:var(--muted);margin-bottom:22px;max-width:46ch}
+.spec{list-style:none;border-top:1px solid var(--line-light)}
+.spec li{
+  display:flex;align-items:center;gap:14px;padding:13px 0;
+  border-bottom:1px solid var(--line-light);font-size:.96rem;color:var(--ink);
+}
+.spec li::before{content:"";width:6px;height:6px;background:var(--bronze);flex:none;transform:rotate(45deg)}
+
+/* ============================================================
+   SECTION 5 — Benefits (dark, architectural linework)
+   ============================================================ */
+.benefits__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-dark);margin-top:clamp(40px,5vw,64px);border:1px solid var(--line-dark)}
+.benefit{background:var(--ink);padding:clamp(28px,3vw,40px) clamp(24px,2.6vw,34px)}
+.benefit svg{width:42px;height:42px;stroke:var(--bronze);stroke-width:1.1;fill:none;margin-bottom:24px}
+.benefit h3{font-size:1.5rem;color:var(--paper);margin-bottom:10px;line-height:1.12}
+.benefit p{font-size:.93rem;color:var(--muted-light);line-height:1.55}
+
+/* ============================================================
+   SECTION 6 — Materials
+   ============================================================ */
+.materials{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2vw,26px);margin-top:clamp(40px,5vw,60px)}
+.material{position:relative}
+.material .frame{aspect-ratio:5/4;width:100%}
+.material .frame img{transition:transform 1s var(--ease),opacity .6s ease}
+.material:hover .frame img{transform:scale(1.05)}
+.material__name{margin-top:14px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:1px solid var(--line-light);padding-top:12px}
+.material__name h3{font-family:var(--sans);font-size:.98rem;font-weight:600;letter-spacing:.01em}
+.material__name span{font-size:11px;letter-spacing:.12em;color:var(--bronze);text-transform:uppercase}
+
+/* ============================================================
+   SECTION 7 — Process
+   ============================================================ */
+.process{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line-light);margin-top:clamp(40px,5vw,64px);border-block:1px solid var(--line-light)}
+.step{background:var(--paper);padding:clamp(28px,2.6vw,38px) clamp(18px,1.8vw,26px) clamp(34px,3vw,46px)}
+.step__num{font-family:var(--serif);font-size:2.6rem;color:var(--bronze);line-height:1;margin-bottom:20px;display:block}
+.step h3{font-size:1.28rem;margin-bottom:12px;line-height:1.15}
+.step p{font-size:.9rem;color:var(--muted);line-height:1.55}
+.bg-stone .process{background:var(--line-light)}
+.bg-stone .step{background:var(--paper-2)}
+
+/* ============================================================
+   SECTION 8 — Developers (split)
+   ============================================================ */
+.dev{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(36px,5vw,80px);align-items:center}
+.dev .frame{aspect-ratio:4/5;width:100%}
+.dev__list{list-style:none;margin-top:30px}
+.dev__list li{
+  display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;
+  padding:18px 0;border-top:1px solid var(--line-dark);
+}
+.dev__list li:last-child{border-bottom:1px solid var(--line-dark)}
+.dev__list .k{font-family:var(--serif);font-size:1.3rem;color:var(--bronze);line-height:1.1;min-width:34px}
+.dev__list .v{color:var(--paper);font-size:1.02rem;align-self:center}
+
+/* ============================================================
+   SECTION 9 — Final CTA / form
+   ============================================================ */
+.cta{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(40px,5vw,80px);align-items:start}
+.cta__copy p{color:var(--muted-light);margin-top:22px;max-width:42ch}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+.field label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-light)}
+.field input,.field textarea{
+  font-family:var(--sans);font-size:15px;color:var(--paper);
+  background:transparent;border:0;border-bottom:1px solid var(--line-dark);
+  padding:11px 0;transition:border-color .4s var(--ease);
+}
+.field textarea{resize:vertical;min-height:80px}
+.field input::placeholder,.field textarea::placeholder{color:rgba(169,158,143,.6)}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--bronze)}
+.file{
+  grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
+  border:1px dashed var(--line-dark);padding:16px 18px;color:var(--muted-light);font-size:13px;
+  letter-spacing:.04em;cursor:pointer;transition:border-color .4s var(--ease),color .4s var(--ease);
+}
+.file:hover{border-color:var(--bronze);color:var(--paper)}
+.file input{display:none}
+.form__submit{grid-column:1/-1;margin-top:6px}
+.form__submit .btn--solid{width:100%;justify-content:center;padding:18px}
+.form__note{grid-column:1/-1;font-size:12px;color:var(--muted-light);margin-top:4px}
+.form__done{
+  grid-column:1/-1;border:1px solid var(--bronze);padding:22px;color:var(--paper);
+  display:none;font-size:.96rem;
+}
+.form.sent .form__done{display:block}
+.form.sent .field,.form.sent .file,.form.sent .form__submit{display:none}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer{background:var(--black);color:var(--muted-light);padding-block:clamp(56px,6vw,84px) 34px}
+.footer__top{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr;gap:clamp(28px,4vw,56px)}
+.footer__brand .brand{color:var(--paper);display:inline-block;margin-bottom:16px}
+.footer__brand p{font-size:.92rem;max-width:30ch;line-height:1.6}
+.footer__social{display:flex;gap:12px;margin-top:24px}
+.footer__social a{
+  width:38px;height:38px;border:1px solid var(--line-dark);display:grid;place-items:center;
+  transition:border-color .4s var(--ease),background .4s var(--ease);
+}
+.footer__social a:hover{border-color:var(--bronze);background:rgba(176,138,91,.12)}
+.footer__social svg{width:16px;height:16px;fill:var(--muted-light)}
+.footer__col h4{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--bronze);margin-bottom:18px}
+.footer__col ul{list-style:none;display:grid;gap:11px}
+.footer__col a,.footer__col li{font-size:.92rem;color:var(--muted-light);transition:color .35s var(--ease)}
+.footer__col a:hover{color:var(--paper)}
+.footer__contact .row{display:flex;gap:10px;margin-bottom:13px;font-size:.92rem;line-height:1.45}
+.footer__contact .row svg{width:15px;height:15px;stroke:var(--bronze);fill:none;stroke-width:1.3;flex:none;margin-top:3px}
+.footer__bottom{
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;
+  margin-top:clamp(40px,5vw,64px);padding-top:26px;border-top:1px solid var(--line-dark);
+  font-size:12px;letter-spacing:.04em;
+}
+.footer__bottom .links{display:flex;gap:24px}
+.footer__bottom a:hover{color:var(--paper)}
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal[data-d="1"]{transition-delay:.08s}
+.reveal[data-d="2"]{transition-delay:.16s}
+.reveal[data-d="3"]{transition-delay:.24s}
+.reveal[data-d="4"]{transition-delay:.32s}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:1080px){
+  .cats{grid-template-columns:repeat(2,1fr)}
+  .benefits__grid{grid-template-columns:repeat(2,1fr)}
+  .materials{grid-template-columns:repeat(2,1fr)}
+  .process{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:900px){
+  .nav,.header__cta{display:none}
+  .nav-toggle{display:flex}
+  .header.menu-open .nav{
+    display:flex;position:fixed;inset:0;z-index:-1;flex-direction:column;
+    justify-content:center;align-items:center;gap:8px;background:var(--black);
+    padding-top:60px;
+  }
+  .header.menu-open .nav a{color:var(--paper);font-family:var(--serif);font-size:1.8rem}
+  .header.menu-open .nav a::after{display:none}
+  .header.menu-open .header__cta{display:block;position:fixed;bottom:8vh;left:0;right:0;text-align:center;z-index:-1}
+}
+@media(max-width:760px){
+  body{font-size:16px}
+  .intro,.statement__grid,.project,.dev,.cta{grid-template-columns:1fr}
+  .project:nth-child(even){direction:ltr}
+  .project__order{order:-1}
+  .form{grid-template-columns:1fr}
+  .footer__top{grid-template-columns:1fr 1fr}
+  .footer__brand{grid-column:1/-1}
+  .callout{font-size:9px;padding:5px 7px}
+  .callout.tr,.callout.mr,.callout.br{display:none}
+}
+@media(max-width:520px){
+  .cats,.benefits__grid,.materials,.process{grid-template-columns:1fr}
+  .footer__top{grid-template-columns:1fr}
+  .footer__bottom{flex-direction:column;align-items:flex-start}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+  .callout{opacity:1;transform:none}
+}
+
+/* ============================================================
+   MODERN OVERRIDES — rounded forms, depth, motion
+   ============================================================ */
+:root{
+  --r-lg:26px; --r:18px; --r-sm:12px; --r-pill:100px;
+  --shadow-sm:0 2px 10px rgba(28,20,12,.06);
+  --shadow:0 22px 55px -28px rgba(28,20,12,.5);
+  --shadow-lg:0 44px 90px -42px rgba(20,14,8,.6);
+  --bronze-glow:0 10px 30px -12px rgba(176,138,91,.6);
+}
+.scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:200;background:linear-gradient(90deg,var(--bronze),var(--champagne));transition:width .12s linear}
+.btn{border-radius:var(--r-pill)}
+.btn--solid{box-shadow:var(--bronze-glow)}
+.btn--solid:hover{box-shadow:0 16px 36px -10px rgba(201,168,119,.78)}
+.btn:hover{transform:translateY(-2px)}
+.frame{border-radius:var(--r)}
+.hero__media .frame{border-radius:0}
+.hero__media .frame img{animation:kenburns 22s var(--ease) both}
+@keyframes kenburns{from{transform:scale(1.02)}to{transform:scale(1.12)}}
+.hero__inner>*{animation:fadeUp 1s var(--ease) backwards}
+.hero__inner>*:nth-child(1){animation-delay:.05s}
+.hero__inner>*:nth-child(2){animation-delay:.18s}
+.hero__inner>*:nth-child(3){animation-delay:.32s}
+.hero__inner>*:nth-child(4){animation-delay:.46s}
+.hero__inner>*:nth-child(5){animation-delay:.6s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.annotated .frame{border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.callout{border-radius:var(--r-pill);border-color:rgba(244,240,233,.4);background:rgba(15,13,10,.5);backdrop-filter:blur(8px);box-shadow:0 8px 24px -12px rgba(0,0,0,.6)}
+.cats{background:transparent;border:0;gap:clamp(14px,1.6vw,20px)}
+.cat{border:1px solid var(--line-light);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.cat:hover{transform:translateY(-7px);box-shadow:var(--shadow)}
+.cat .frame{border-radius:0}
+.project .frame{border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.benefits__grid{background:transparent;border:0;gap:clamp(14px,1.6vw,20px)}
+.benefit{border:1px solid var(--line-dark);border-radius:var(--r-lg);transition:transform .5s var(--ease),border-color .5s var(--ease),background .5s var(--ease)}
+.benefit:hover{transform:translateY(-7px);border-color:rgba(176,138,91,.5);background:#221d17}
+.benefit svg{transition:transform .5s var(--ease)}
+.benefit:hover svg{transform:translateY(-3px) scale(1.06)}
+.material .frame{border-radius:var(--r);box-shadow:var(--shadow-sm);transition:box-shadow .5s var(--ease)}
+.material:hover .frame{box-shadow:var(--shadow)}
+.process{background:transparent;border-block:0;gap:clamp(14px,1.6vw,20px)}
+.step{border:1px solid var(--line-light);border-radius:var(--r-lg);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.step:hover{transform:translateY(-7px);box-shadow:var(--shadow)}
+.bg-stone .process{background:transparent}
+.dev .frame{border-radius:var(--r-lg);box-shadow:var(--shadow-lg)}
+.form .field input,.form .field textarea{border:1px solid var(--line-dark);border-radius:var(--r-sm);background:rgba(255,255,255,.04);padding:14px 16px}
+.form .field input:focus,.form .field textarea:focus{background:rgba(255,255,255,.07);border-color:var(--bronze)}
+.file{border-radius:var(--r-sm)}
+.form__done{border-radius:var(--r)}
+.footer__social a{border-radius:50%}
+.reveal{transform:translateY(28px) scale(.99)}
+.reveal.in{transform:none}
+
+
+
+/* ---- project detail page ---- */
+.pback{display:inline-flex;align-items:center;gap:.6em;margin-bottom:26px;
+  font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,240,233,.75)}
+.pback:hover{color:var(--bronze)}
+.phero{position:relative;min-height:78vh;display:flex;align-items:flex-end;color:var(--paper);isolation:isolate;padding-bottom:clamp(48px,6vw,84px)}
+.phero__media{position:absolute;inset:0;z-index:-1}
+.phero__media .frame{position:absolute;inset:0}
+.phero__media::after{content:"";position:absolute;inset:0;z-index:4;
+  background:linear-gradient(180deg,rgba(8,7,5,.55),rgba(8,7,5,.2) 35%,rgba(8,7,5,.78))}
+.phero__inner{padding-top:140px}
+.phero h1{margin:18px 0 18px;max-width:16ch}
+.phero__tag{max-width:46ch;color:rgba(244,240,233,.82);font-size:clamp(1.05rem,1.5vw,1.28rem);line-height:1.5}
+.factsheet{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-light);border-block:1px solid var(--line-light)}
+.factsheet .cell{background:var(--paper-2);padding:clamp(22px,2.4vw,32px) clamp(18px,2vw,26px)}
+.factsheet .cell span{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--bronze)}
+.factsheet .cell strong{display:block;font-family:var(--serif);font-size:clamp(1.4rem,2vw,1.9rem);font-weight:500;color:var(--ink);margin-top:8px;line-height:1.05}
+.prose p{max-width:64ch;font-size:clamp(1.02rem,1.3vw,1.15rem);color:var(--muted);margin-top:1.1em}
+.prose p:first-of-type{margin-top:0}
+.deliver{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(32px,5vw,72px);align-items:start}
+.deliver h3{font-size:1.7rem;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.chip{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line-light);padding:10px 15px;color:var(--muted)}
+.pgallery{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:14px;margin-top:clamp(36px,4vw,56px)}
+.pgallery .frame{width:100%;height:100%;min-height:200px}
+.pgallery .g1{grid-row:1/3}
+.nextgrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.4vw,28px);margin-top:clamp(36px,4vw,52px)}
+.nextcard{display:block;overflow:hidden;border:1px solid var(--line-light)}
+.nextcard .frame{aspect-ratio:16/10;width:100%}
+.nextcard .frame img{transition:transform 1s var(--ease)}
+.nextcard:hover .frame img{transform:scale(1.05)}
+.nextcard__b{padding:20px 22px;display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+.nextcard__b span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--bronze)}
+.nextcard__b h3{font-size:1.5rem}
+@media(max-width:760px){
+ .deliver{grid-template-columns:1fr}
+ .factsheet{grid-template-columns:1fr 1fr}
+ .pgallery{grid-template-columns:1fr;grid-template-rows:none}
+ .pgallery .g1{grid-row:auto}
+ .nextgrid{grid-template-columns:1fr}
+}
+.chip{border-radius:var(--r-pill)}
+.nextcard{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.nextcard:hover{transform:translateY(-7px);box-shadow:var(--shadow)}
+.factsheet{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+.deliver .spec{margin-top:18px}
+.pgallery .frame{box-shadow:var(--shadow)}
+.phero__inner>*{animation:fadeUp 1s var(--ease) backwards}
+.phero__inner>*:nth-child(1){animation-delay:.05s}
+.phero__inner>*:nth-child(2){animation-delay:.18s}
+.phero__inner>*:nth-child(3){animation-delay:.32s}
+.phero__inner>*:nth-child(4){animation-delay:.46s}
+.phero__media .frame img{animation:kenburns 22s var(--ease) both}
+</style>
+</head>
+<body data-page="project" data-proj="3">
+<div id="app">
+<div class="scroll-progress" id="progress"></div>
+<header class="header" id="header">
+  <div class="wrap header__inner">
+    <a href="index.html" class="brand">Nume Brand</a>
+    <nav class="nav" id="nav">
+      <a href="index.html">Acasă</a>
+      <a href="index.html#amenajari">Amenajări lobby</a>
+      <a href="index.html#proiecte">Proiecte</a>
+      <a href="index.html#solutii">Soluții</a>
+      <a href="index.html#dezvoltatori">Pentru dezvoltatori</a>
+      <a href="index.html#proces">Proces</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <div class="header__cta">
+      <a href="index.html#contact" class="btn btn--solid">Solicită un concept <span class="arrow">→</span></a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Meniu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+<section class="phero">
+  <div class="phero__media"><div class="frame m-smoke"><img src="https://images.unsplash.com/photo-1758448721205-8465cebc26af?auto=format&fit=crop&w=1600&q=80" alt="North Avenue Living — zona de acces amenajată" onerror="this.style.display='none'"></div></div>
+  <div class="wrap phero__inner">
+    <a href="index.html#proiecte" class="pback">← Toate proiectele</a>
+    <div><span class="eyebrow">Studiu de caz · Ansamblu · Multi-scară</span></div>
+    <h1 class="display-xl">North Avenue Living</h1>
+    <p class="phero__tag">Soluție modulară pentru un ansamblu rezidențial cu mai multe scări.</p>
+  </div>
+</section>
+
+<section class="bg-stone">
+  <div class="wrap">
+    <div class="factsheet">
+      <div class="cell"><span>Localizare</span><strong>Brașov</strong></div>
+      <div class="cell"><span>An</span><strong>2024</strong></div>
+      <div class="cell"><span>Tip proiect</span><strong>Ansamblu multi-scară</strong></div>
+      <div class="cell"><span>Apartamente</span><strong>3 corpuri · 210</strong></div>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-paper">
+  <div class="wrap">
+    <div class="intro reveal" style="margin-bottom:clamp(36px,4vw,56px)">
+      <div>
+        <span class="eyebrow eyebrow--muted intro__eyebrow">Prezentare</span>
+        <h2 class="display-l">Despre proiect</h2>
+      </div>
+      <p class="lead intro__support">North Avenue Living a fost un exercițiu de standardizare: o soluție modulară, replicabilă pe mai multe scări și faze de dezvoltare, fără pierderi de calitate.</p>
+    </div>
+    <div class="prose reveal">
+      <p>Ansamblul cuprinde mai multe corpuri construite în etape diferite. Provocarea era să livrăm aceeași imagine și aceleași detalii pe toate scările, indiferent de momentul execuției, și să putem configura ușor în funcție de numărul de apartamente.</p>
+      <p>Am dezvoltat un sistem coordonat de cutii poștale, numerotare și semnalistică, cu materiale identice și toleranțe gândite pentru montaj repetabil. Rezultatul este un standard de amenajare care se aplică predictibil pe întregul ansamblu, etapă cu etapă.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-stone">
+  <div class="wrap deliver">
+    <div class="reveal">
+      <span class="eyebrow eyebrow--muted">Intervenție</span>
+      <h3 style="margin-top:14px">Ce am livrat</h3>
+      <ul class="spec" style="margin-top:18px"><li>Standardizare pe toate corpurile</li><li>Materiale coordonate</li><li>Numerotare apartamente</li><li>Configurare pentru mai multe faze de dezvoltare</li></ul>
+    </div>
+    <div class="reveal" data-d="1">
+      <span class="eyebrow eyebrow--muted">Materiale folosite</span>
+      <div class="chips"><span class="chip">Metal vopsit electrostatic</span><span class="chip">Culori RAL</span><span class="chip">Inox satinat</span><span class="chip">PVC decorativ</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-dark">
+  <div class="wrap">
+    <span class="eyebrow">Galerie</span>
+    <div class="pgallery reveal">
+      <div class="frame m-glass g1"><img src="https://images.unsplash.com/photo-1758448500688-3ababa93fd67?auto=format&fit=crop&w=1000&q=80" alt="North Avenue Living — detaliu" onerror="this.style.display='none'"></div>
+      <div class="frame m-rib"><img src="https://images.unsplash.com/photo-1758194090785-8e09b7288199?auto=format&fit=crop&w=1000&q=80" alt="North Avenue Living — material" onerror="this.style.display='none'"></div>
+      <div class="frame m-metal"><img src="https://images.unsplash.com/photo-1758448721149-aa0ce8e1b2c9?auto=format&fit=crop&w=1000&q=80" alt="North Avenue Living — finisaj" onerror="this.style.display='none'"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-paper">
+  <div class="wrap">
+    <span class="eyebrow eyebrow--muted">Alte proiecte</span>
+    <div class="nextgrid reveal"><a class="nextcard" href="proiect-one-north-lofts.html"><div class="frame m-glass"><img src="https://images.unsplash.com/photo-1758448500688-3ababa93fd67?auto=format&fit=crop&w=1600&q=80" alt="One North Lofts" onerror="this.style.display='none'"></div><div class="nextcard__b"><h3>One North Lofts</h3><span>Proiect →</span></div></a><a class="nextcard" href="proiect-novum-residence.html"><div class="frame m-rib"><img src="https://images.unsplash.com/photo-1758194090785-8e09b7288199?auto=format&fit=crop&w=1600&q=80" alt="Novum Residence" onerror="this.style.display='none'"></div><div class="nextcard__b"><h3>Novum Residence</h3><span>Proiect →</span></div></a></div>
+  </div>
+</section>
+
+<section class="section bg-dark">
+  <div class="wrap" style="text-align:center;max-width:720px;margin-inline:auto">
+    <span class="eyebrow">Hai să începem</span>
+    <h2 class="display-l" style="color:var(--paper);margin:18px 0 16px">Ai un proiect rezidențial similar?</h2>
+    <p class="lead" style="color:var(--muted-light);margin-bottom:30px">Trimite planul zonei de acces, randările sau câteva fotografii din șantier. Îți propunem o soluție adaptată arhitecturii și nivelului proiectului.</p>
+    <a href="index.html#contact" class="btn btn--solid">Solicită o propunere <span class="arrow">→</span></a>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="index.html" class="brand" style="color:var(--paper)">Nume Brand</a>
+        <p style="margin-top:16px">Amenajări complete de lobby pentru dezvoltări rezidențiale. Concept, producție și montaj, livrate ca un singur rezultat.</p>
+      </div>
+      <div class="footer__col">
+        <h4>Navigare</h4>
+        <ul>
+          <li><a href="index.html">Acasă</a></li>
+          <li><a href="index.html#amenajari">Amenajări lobby</a></li>
+          <li><a href="index.html#proiecte">Proiecte</a></li>
+          <li><a href="index.html#solutii">Soluții</a></li>
+          <li><a href="index.html#proces">Proces</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Proiecte</h4>
+        <ul><li><a href="proiect-one-north-lofts.html">One North Lofts</a></li><li><a href="proiect-novum-residence.html">Novum Residence</a></li><li><a href="proiect-north-avenue-living.html">North Avenue Living</a></li></ul>
+      </div>
+      <div class="footer__col footer__contact">
+        <h4>Contact</h4>
+        <div class="row"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg><span>office@numebrand.ro</span></div>
+        <div class="row"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-3 2a14 14 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>+40 7xx xxx xxx</span></div>
+        <div class="row"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Sediu în România<br>Montaj și acoperire la nivel național</span></div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Nume Brand. Toate drepturile rezervate.</span>
+      <div class="links"><a href="index.html">Politica de confidențialitate</a><a href="index.html">Termeni și condiții</a></div>
+    </div>
+  </div>
+</footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+/* Nume Brand — public site runtime: loads content from Supabase, renders, handles the contact form. */
+(function(){
+  "use strict";
+  var DEFAULTS = {"BRAND": "Nume Brand", "HERO_EYEBROW": "Amenajări lobby pentru dezvoltări rezidențiale", "HERO_H1": "Lobby-uri care cresc percepția de valoare a unui proiect rezidențial.", "HERO_SUB": "Amenajări complete pentru zone de acces și spații comune: identitate, semnalistică, placări, cutii poștale premium și soluții tehnice integrate.", "HERO_CTA1": "Solicită o propunere", "HERO_CTA2": "Vezi proiectele", "HERO_TRUST": "Concept, producție și montaj pentru proiecte rezidențiale.", "IMG_HERO": "https://images.unsplash.com/photo-1758448721149-aa0ce8e1b2c9?auto=format&fit=crop&w=2000&q=80", "CO_TL": "Cutii poștale", "CO_TR": "Avizier", "CO_ML": "Semnalistică etaj", "CO_MR": "Placare lift", "CO_BL": "Mască hidrant", "CO_BM": "Panou decorativ", "CO_BR": "Logo ansamblu", "S2_EYEBROW": "Filosofia noastră", "S2_H2": "Nu vindem doar cutii poștale.", "S2_LEAD": "Un lobby nu este o colecție de produse. Este prima interacțiune a locatarului, vizitatorului sau potențialului cumpărător cu proiectul tău.", "S2_SUPPORT": "Dezvoltăm soluții integrate pentru spațiile comune ale ansamblurilor rezidențiale: de la identitatea intrării și semnalistică, până la placări, cutii poștale, aviziere și mascarea elementelor tehnice.", "IMG_S2": "https://images.unsplash.com/photo-1758448721205-8465cebc26af?auto=format&fit=crop&w=2000&q=80", "SOL_EYEBROW": "Ce amenajăm", "SOL_H2": "Opt categorii care alcătuiesc un lobby coerent.", "SOL_SUP": "Fiecare element este proiectat în relație cu arhitectura și cu celelalte componente ale spațiului de acces.", "CAT1_T": "Zone de acces și recepție", "CAT1_D": "Spațiul care dă tonul întregului ansamblu.", "CAT2_T": "Cutii poștale și aviziere", "CAT2_D": "Fronturi unitare, numerotare și avizier integrat.", "CAT3_T": "Semnalistică și orientare", "CAT3_D": "Numerotare etaje, direcționare și wayfinding.", "CAT4_T": "Placări pereți, lifturi și uși", "CAT4_D": "Finisaje continue pe suprafețele cu trafic intens.", "CAT5_T": "Mascări tehnice integrate", "CAT5_D": "Hidranți, tablouri și nișe ascunse elegant.", "CAT6_T": "Identitate vizuală pentru ansamblu", "CAT6_D": "Logo, monogramă și elemente de brand built-in.", "CAT7_T": "Totemuri și semnalistică exterioară", "CAT7_D": "Identitate vizibilă de la stradă la intrare.", "CAT8_T": "Elemente decorative pentru spații comune", "CAT8_D": "Panouri, texturi și accente care personalizează.", "PRJ_EYEBROW": "Proiecte", "PRJ_H2": "Proiecte care vorbesc prin detalii.", "PRJ_SUP": "Studii de caz din ansambluri rezidențiale — concept, producție și montaj livrate ca un singur rezultat.", "P1_NAME": "One North Lofts", "P1_TAG": "Zona poștală · Acces", "P1_DESC": "Amenajare completă pentru zona poștală și spațiile de acces.", "P1_SPECS": "Fronturi Lacobel fumuriu\nNumerotare decupată laser\nAvizier integrat\nSemnalistică discretă\nMontaj complet", "P1_IMG": "https://images.unsplash.com/photo-1758448500688-3ababa93fd67?auto=format&fit=crop&w=1200&q=80", "P2_NAME": "Novum Residence", "P2_TAG": "Lobby · Circulații", "P2_DESC": "Identitate coerentă pentru lobby și circulațiile comune.", "P2_SPECS": "Placări decorative\nPanouri informative\nSemnalistică etaje\nCutii poștale personalizate\nMascări tehnice", "P2_IMG": "https://images.unsplash.com/photo-1758194090785-8e09b7288199?auto=format&fit=crop&w=1200&q=80", "P3_NAME": "North Avenue Living", "P3_TAG": "Ansamblu · Multi-scară", "P3_DESC": "Soluție modulară pentru un ansamblu rezidențial cu mai multe scări.", "P3_SPECS": "Standardizare pe toate corpurile\nMateriale coordonate\nNumerotare apartamente\nConfigurare pentru mai multe faze de dezvoltare", "P3_IMG": "https://images.unsplash.com/photo-1758448721205-8465cebc26af?auto=format&fit=crop&w=1200&q=80", "BEN_EYEBROW": "Avantaje", "BEN_H2": "Un singur partener. Un rezultat coerent.", "BEN_SUP": "De la concept la montaj, întregul lobby este gândit, produs și instalat ca un singur sistem.", "BEN1_T": "Concept unitar pentru tot lobby-ul", "BEN1_D": "Toate elementele sunt proiectate împreună, nu adunate separat.", "BEN2_T": "Personalizare după plan și arhitectură", "BEN2_D": "Soluții adaptate dimensiunilor reale și intenției proiectului.", "BEN3_T": "Materiale și finisaje coordonate", "BEN3_D": "Paletă de finisaje controlată pe întreaga amenajare.", "BEN4_T": "Producție pentru una sau mai multe scări", "BEN4_D": "De la o intrare unică la ansambluri cu corpuri multiple.", "BEN5_T": "Montaj profesionist la locație", "BEN5_D": "Aliniere, integrare și finisaj curat, executate de echipa noastră.", "BEN6_T": "Soluții pentru nișe tehnice și pereți imperfecți", "BEN6_D": "Mascări și ajustări care fac din constrângeri detalii intenționate.", "MAT_EYEBROW": "Materiale", "MAT_H2": "Materiale care susțin percepția de calitate.", "MAT_SUP": "Suprafețe, muchii și îmbinări alese pentru durabilitate și pentru felul în care reflectă lumina lobby-ului.", "PRO_EYEBROW": "Proces", "PRO_H2": "De la plan la montaj.", "PRO_SUP": "Un parcurs clar, în cinci etape, de la primele fișiere până la predarea finală a lobby-ului.", "STEP1_T": "Trimite planul sau fotografiile", "STEP1_D": "Plan de arhitectură, randări, număr de apartamente sau imagini din șantier.", "STEP2_T": "Primești conceptul", "STEP2_D": "Configurăm zonele de acces, finisajele și elementele necesare.", "STEP3_T": "Validăm soluția", "STEP3_D": "Stabilim materialele, poziționarea și detaliile de execuție.", "STEP4_T": "Producem și montăm", "STEP4_D": "Livrare, montaj, aliniere și integrare în spațiul existent.", "STEP5_T": "Predare finală", "STEP5_D": "Lobby pregătit pentru recepția proiectului și utilizare.", "DEV_EYEBROW": "Pentru dezvoltatori", "DEV_H2": "Amenajări scalabile pentru ansambluri rezidențiale.", "DEV_INTRO": "Lucrăm atât pentru proiecte punctuale, cât și pentru ansambluri cu mai multe blocuri, scări sau faze de dezvoltare.", "DEV1": "Soluții pentru una sau mai multe scări", "DEV2": "Standardizare între corpuri", "DEV3": "Configurare în funcție de numărul de apartamente", "DEV4": "Implementare etapizată", "DEV5": "Consultanță înainte de execuție", "DEV6": "Montaj național", "IMG_DEV": "https://images.unsplash.com/photo-1758448500688-3ababa93fd67?auto=format&fit=crop&w=1100&q=80", "CTA_EYEBROW": "Hai să începem", "CTA_H2": "Ai un proiect rezidențial în dezvoltare?", "CTA_TEXT": "Trimite planul zonei de acces, randările sau câteva fotografii din șantier. Îți propunem o soluție adaptată arhitecturii și nivelului proiectului.", "CTA_RESP": "Răspuns în maximum 48 de ore lucrătoare.", "CTA_BTN": "Solicită propunerea de amenajare", "FOOT_DESC": "Amenajări complete de lobby pentru dezvoltări rezidențiale. Concept, producție și montaj, livrate ca un singur rezultat.", "FOOT_EMAIL": "office@numebrand.ro", "FOOT_PHONE": "+40 7xx xxx xxx", "FOOT_AREA1": "Sediu în România", "FOOT_AREA2": "Montaj și acoperire la nivel național", "P1_LOC": "București, Sector 1", "P1_YEAR": "2024", "P1_TYPE": "Lofturi premium", "P1_UNITS": "48", "P1_INTRO": "Pentru One North Lofts am tratat zona poștală și spațiile de acces ca pe o singură compoziție, gândită să transmită rafinament din primul pas în clădire.", "P1_BODY1": "Proiectul cerea un limbaj vizual discret, dar precis: fronturi continue, fără elemente de fixare vizibile, și o paletă restrânsă de finisaje care să pună în valoare lumina naturală a holului. Cutiile poștale, avizierul și semnalistica trebuiau să pară un singur obiect, nu produse adăugate ulterior.", "P1_BODY2": "Am realizat fronturi din Lacobel fumuriu cu numerotare decupată laser, integrate într-un avizier discret și o semnalistică minimală pe etaje. Montajul a fost executat la milimetru, cu alinieri controlate față de placările existente, astfel încât întreaga zonă de acces să citească omogen.", "P1_MATERIALS": "Lacobel fumuriu, Inox satinat, MDF riflat, Metal vopsit electrostatic", "P1_IMG2": "https://images.unsplash.com/photo-1758448721205-8465cebc26af?auto=format&fit=crop&w=1000&q=80", "P1_IMG3": "https://images.unsplash.com/photo-1758194090785-8e09b7288199?auto=format&fit=crop&w=1000&q=80", "P1_IMG4": "https://images.unsplash.com/photo-1758448721149-aa0ce8e1b2c9?auto=format&fit=crop&w=1000&q=80", "P2_LOC": "Cluj-Napoca", "P2_YEAR": "2023", "P2_TYPE": "Ansamblu rezidențial", "P2_UNITS": "120", "P2_INTRO": "La Novum Residence, obiectivul a fost o identitate coerentă, care să lege lobby-ul de toate circulațiile comune ale ansamblului.", "P2_BODY1": "Cu mai multe holuri și paliere de trecere, riscul era ca spațiile comune să arate fragmentat. Am pornit de la o paletă de materiale și o logică de semnalizare comune, aplicate consecvent de la intrare până la ultimul etaj.", "P2_BODY2": "Placările decorative, panourile informative și semnalistica de etaj au fost coordonate cromatic și dimensional. Cutiile poștale personalizate și mascările tehnice completează imaginea, astfel încât fiecare locatar și vizitator regăsește același nivel de finisaj în tot ansamblul.", "P2_MATERIALS": "Alucobond, MDF riflat, Sticlă fumurie, Metal vopsit electrostatic", "P2_IMG2": "https://images.unsplash.com/photo-1758448721149-aa0ce8e1b2c9?auto=format&fit=crop&w=1000&q=80", "P2_IMG3": "https://images.unsplash.com/photo-1758448500688-3ababa93fd67?auto=format&fit=crop&w=1000&q=80", "P2_IMG4": "https://images.unsplash.com/photo-1758448721205-8465cebc26af?auto=format&fit=crop&w=1000&q=80", "P3_LOC": "Brașov", "P3_YEAR": "2024", "P3_TYPE": "Ansamblu multi-scară", "P3_UNITS": "3 corpuri · 210", "P3_INTRO": "North Avenue Living a fost un exercițiu de standardizare: o soluție modulară, replicabilă pe mai multe scări și faze de dezvoltare, fără pierderi de calitate.", "P3_BODY1": "Ansamblul cuprinde mai multe corpuri construite în etape diferite. Provocarea era să livrăm aceeași imagine și aceleași detalii pe toate scările, indiferent de momentul execuției, și să putem configura ușor în funcție de numărul de apartamente.", "P3_BODY2": "Am dezvoltat un sistem coordonat de cutii poștale, numerotare și semnalistică, cu materiale identice și toleranțe gândite pentru montaj repetabil. Rezultatul este un standard de amenajare care se aplică predictibil pe întregul ansamblu, etapă cu etapă.", "P3_MATERIALS": "Metal vopsit electrostatic, Culori RAL, Inox satinat, PVC decorativ", "P3_IMG2": "https://images.unsplash.com/photo-1758448500688-3ababa93fd67?auto=format&fit=crop&w=1000&q=80", "P3_IMG3": "https://images.unsplash.com/photo-1758194090785-8e09b7288199?auto=format&fit=crop&w=1000&q=80", "P3_IMG4": "https://images.unsplash.com/photo-1758448721149-aa0ce8e1b2c9?auto=format&fit=crop&w=1000&q=80"};
+  var TYPE = {"BRAND": "text", "HERO_EYEBROW": "text", "HERO_H1": "textarea", "HERO_SUB": "textarea", "HERO_CTA1": "text", "HERO_CTA2": "text", "HERO_TRUST": "text", "IMG_HERO": "url", "CO_TL": "text", "CO_TR": "text", "CO_ML": "text", "CO_MR": "text", "CO_BL": "text", "CO_BM": "text", "CO_BR": "text", "S2_EYEBROW": "text", "S2_H2": "text", "S2_LEAD": "textarea", "S2_SUPPORT": "textarea", "IMG_S2": "url", "SOL_EYEBROW": "text", "SOL_H2": "text", "SOL_SUP": "textarea", "CAT1_T": "text", "CAT1_D": "text", "CAT2_T": "text", "CAT2_D": "text", "CAT3_T": "text", "CAT3_D": "text", "CAT4_T": "text", "CAT4_D": "text", "CAT5_T": "text", "CAT5_D": "text", "CAT6_T": "text", "CAT6_D": "text", "CAT7_T": "text", "CAT7_D": "text", "CAT8_T": "text", "CAT8_D": "text", "PRJ_EYEBROW": "text", "PRJ_H2": "text", "PRJ_SUP": "textarea", "P1_NAME": "text", "P1_DESC": "textarea", "P1_TAG": "text", "P1_LOC": "text", "P1_YEAR": "text", "P1_TYPE": "text", "P1_UNITS": "text", "P1_INTRO": "textarea", "P1_BODY1": "textarea", "P1_BODY2": "textarea", "P1_SPECS": "lines", "P1_MATERIALS": "csv", "P1_IMG": "url", "P1_IMG2": "url", "P1_IMG3": "url", "P1_IMG4": "url", "P2_NAME": "text", "P2_DESC": "textarea", "P2_TAG": "text", "P2_LOC": "text", "P2_YEAR": "text", "P2_TYPE": "text", "P2_UNITS": "text", "P2_INTRO": "textarea", "P2_BODY1": "textarea", "P2_BODY2": "textarea", "P2_SPECS": "lines", "P2_MATERIALS": "csv", "P2_IMG": "url", "P2_IMG2": "url", "P2_IMG3": "url", "P2_IMG4": "url", "P3_NAME": "text", "P3_DESC": "textarea", "P3_TAG": "text", "P3_LOC": "text", "P3_YEAR": "text", "P3_TYPE": "text", "P3_UNITS": "text", "P3_INTRO": "textarea", "P3_BODY1": "textarea", "P3_BODY2": "textarea", "P3_SPECS": "lines", "P3_MATERIALS": "csv", "P3_IMG": "url", "P3_IMG2": "url", "P3_IMG3": "url", "P3_IMG4": "url", "BEN_EYEBROW": "text", "BEN_H2": "text", "BEN_SUP": "textarea", "BEN1_T": "text", "BEN1_D": "text", "BEN2_T": "text", "BEN2_D": "text", "BEN3_T": "text", "BEN3_D": "text", "BEN4_T": "text", "BEN4_D": "text", "BEN5_T": "text", "BEN5_D": "text", "BEN6_T": "text", "BEN6_D": "text", "MAT_EYEBROW": "text", "MAT_H2": "text", "MAT_SUP": "textarea", "PRO_EYEBROW": "text", "PRO_H2": "text", "PRO_SUP": "textarea", "STEP1_T": "text", "STEP1_D": "text", "STEP2_T": "text", "STEP2_D": "text", "STEP3_T": "text", "STEP3_D": "text", "STEP4_T": "text", "STEP4_D": "text", "STEP5_T": "text", "STEP5_D": "text", "DEV_EYEBROW": "text", "DEV_H2": "text", "DEV_INTRO": "textarea", "DEV1": "text", "DEV2": "text", "DEV3": "text", "DEV4": "text", "DEV5": "text", "DEV6": "text", "IMG_DEV": "url", "CTA_EYEBROW": "text", "CTA_H2": "text", "CTA_TEXT": "textarea", "CTA_RESP": "text", "CTA_BTN": "text", "FOOT_DESC": "textarea", "FOOT_EMAIL": "text", "FOOT_PHONE": "text", "FOOT_AREA1": "text", "FOOT_AREA2": "text"};
+  var SLUGS = ["proiect-one-north-lofts.html", "proiect-novum-residence.html", "proiect-north-avenue-living.html"];
+  var INDEX_TMPL = "<div class=\"scroll-progress\" id=\"progress\"></div>\n\n<!-- ============================================================\n     HEADER\n============================================================ -->\n<header class=\"header\" id=\"header\">\n  <div class=\"wrap header__inner\">\n    <a href=\"#top\" class=\"brand\">{{BRAND}}</a>\n    <nav class=\"nav\" id=\"nav\">\n      <a href=\"#top\">Acasă</a>\n      <a href=\"#amenajari\">Amenajări lobby</a>\n      <a href=\"#proiecte\">Proiecte</a>\n      <a href=\"#solutii\">Soluții</a>\n      <a href=\"#dezvoltatori\">Pentru dezvoltatori</a>\n      <a href=\"#proces\">Proces</a>\n      <a href=\"#contact\">Contact</a>\n    </nav>\n    <div class=\"header__cta\">\n      <a href=\"#contact\" class=\"btn btn--solid\">Solicită un concept <span class=\"arrow\">→</span></a>\n    </div>\n    <button class=\"nav-toggle\" id=\"navToggle\" aria-label=\"Meniu\" aria-expanded=\"false\">\n      <span></span><span></span><span></span>\n    </button>\n  </div>\n</header>\n\n<!-- ============================================================\n     HERO  (H1)\n     IMAGE DIRECTION: full-bleed contemporary residential lobby at\n     dusk — warm interior lighting, a wall of bronze/dark mailboxes\n     receding down a corridor, polished stone floor, planter at far end.\n============================================================ -->\n<main id=\"top\">\n<section class=\"hero\">\n  <div class=\"hero__media\">\n    <div class=\"frame m-smoke\">\n      <img src=\"{{IMG_HERO}}\" alt=\"Lobby rezidențial contemporan cu front de cutii poștale și iluminat ambiental\" onerror=\"this.style.display='none'\">\n    </div>\n  </div>\n  <div class=\"wrap hero__inner\">\n    <span class=\"eyebrow\">{{HERO_EYEBROW}}</span>\n    <h1 class=\"display-xl\">{{HERO_H1}}</h1>\n    <p class=\"hero__sub\">{{HERO_SUB}}</p>\n    <div class=\"hero__actions\">\n      <a href=\"#contact\" class=\"btn btn--solid\">{{HERO_CTA1}} <span class=\"arrow\">→</span></a>\n      <a href=\"#proiecte\" class=\"btn btn--outline\">{{HERO_CTA2}}</a>\n    </div>\n    <div class=\"hero__trust\"><span class=\"dash\"></span>{{HERO_TRUST}}</div>\n  </div>\n</section>\n\n<!-- ============================================================\n     SECTION 2 — Statement + annotated lobby\n     IMAGE DIRECTION: wide editorial photo of a finished lobby seen\n     head-on — mailbox bank left, signage, lift cladding, decorative\n     panel — enough breathing room around features for callouts.\n============================================================ -->\n<section class=\"section bg-paper\" id=\"amenajari\">\n  <div class=\"wrap\">\n    <div class=\"statement__grid\">\n      <div class=\"reveal\">\n        <span class=\"eyebrow eyebrow--muted\">{{S2_EYEBROW}}</span>\n        <h2 class=\"display-l\" style=\"margin-top:20px\">{{S2_H2}}</h2>\n        <p class=\"statement__lead\">{{S2_LEAD}}</p>\n      </div>\n      <div class=\"reveal\" data-d=\"1\">\n        <p class=\"statement__support\">{{S2_SUPPORT}}</p>\n      </div>\n    </div>\n\n    <div class=\"annotated reveal\" id=\"annotated\">\n      <div class=\"frame m-glass\">\n        <img src=\"{{IMG_S2}}\" alt=\"Lobby rezidențial amenajat complet cu elementele integrate ale spațiului de acces\" onerror=\"this.style.display='none'\">\n      </div>\n      <span class=\"callout tl\">{{CO_TL}}</span>\n      <span class=\"callout tr\">{{CO_TR}}</span>\n      <span class=\"callout ml\">{{CO_ML}}</span>\n      <span class=\"callout mr\">{{CO_MR}}</span>\n      <span class=\"callout bl\">{{CO_BL}}</span>\n      <span class=\"callout bm\">{{CO_BM}}</span>\n      <span class=\"callout br\">{{CO_BR}}</span>\n    </div>\n  </div>\n</section>\n\n<!-- ============================================================\n     SECTION 3 — What we design (grid of 8)\n     IMAGE DIRECTION: one tight material/space photo per category —\n     reception desk, mailbox bank, floor signage, lift cladding,\n     hydrant masking panel, building monogram wall, exterior totem,\n     decorative slatted panel.\n============================================================ -->\n<section class=\"section bg-stone\" id=\"solutii\">\n  <div class=\"wrap\">\n    <div class=\"intro reveal\">\n      <div>\n        <span class=\"eyebrow eyebrow--muted intro__eyebrow\">{{SOL_EYEBROW}}</span>\n        <h2 class=\"display-l\">{{SOL_H2}}</h2>\n      </div>\n      <p class=\"lead intro__support\">{{SOL_SUP}}</p>\n    </div>\n\n    <div class=\"cats reveal\">\n      <a class=\"cat\" href=\"#contact\">\n        <div class=\"frame m-smoke\"><img src=\"https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=900&q=80\" alt=\"Zonă de acces și recepție\" onerror=\"this.style.display='none'\"></div>\n        <div class=\"cat__body\"><span class=\"cat__num\">01</span><h3>{{CAT1_T}}</h3><p>{{CAT1_D}}</p></div>\n      </a>\n      <a class=\"cat\" href=\"#contact\">\n        <div class=\"frame m-metal\"><img src=\"https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=900&q=80\" alt=\"Cutii poștale și aviziere\" onerror=\"this.style.display='none'\"></div>\n        <div class=\"cat__body\"><span class=\"cat__num\">02</span><h3>{{CAT2_T}}</h3><p>{{CAT2_D}}</p></div>\n      </a>\n      <a class=\"cat\" href=\"#contact\">\n        <div class=\"frame m-glass\"><img src=\"https://images.unsplash.com/photo-1545063328-c8e3faffa16f?auto=format&fit=crop&w=900&q=80\" alt=\"Semnalistică și orientare\" onerror=\"this.style.display='none'\"></div>\n        <div class=\"cat__body\"><span class=\"cat__num\">03</span><h3>{{CAT3_T}}</h3><p>{{CAT3_D}}</p></div>\n      </a>\n      <a class=\"cat\" href=\"#contact\">\n        <div class=\"frame m-rib\"><img src=\"https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=80\" alt=\"Placări pereți, lifturi și uși\" onerror=\"this.style.display='none'\"></div>\n        <div class=\"cat__body\"><span class=\"cat__num\">04</span><h3>{{CAT4_T}}</h3><p>{{CAT4_D}}</p></div>\n      </a>\n      <a class=\"cat\" href=\"#contact\">\n        <div class=\"frame m-pvc\"><img src=\"https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=900&q=80\" alt=\"Mascări tehnice integrate\" onerror=\"this.style.display='none'\"></div>\n        <div class=\"cat__body\"><span class=\"cat__num\">05</span><h3>{{CAT5_T}}</h3><p>{{CAT5_D}}</p></div>\n      </a>\n      <a class=\"cat\" href=\"#contact\">\n        <div class=\"frame m-bronze\"><img src=\"https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=900&q=80\" alt=\"Identitate vizuală pentru ansamblu\" onerror=\"this.style.display='none'\"></div>\n        <div class=\"cat__body\"><span class=\"cat__num\">06</span><h3>{{CAT6_T}}</h3><p>{{CAT6_D}}</p></div>\n      </a>\n      <a class=\"cat\" href=\"#contact\">\n        <div class=\"frame m-stone\"><img src=\"https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80\" alt=\"Totemuri și semnalistică exterioară\" onerror=\"this.style.display='none'\"></div>\n        <div class=\"cat__body\"><span class=\"cat__num\">07</span><h3>{{CAT7_T}}</h3><p>{{CAT7_D}}</p></div>\n      </a>\n      <a class=\"cat\" href=\"#contact\">\n        <div class=\"frame m-wood\"><img src=\"https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=80\" alt=\"Elemente decorative pentru spații comune\" onerror=\"this.style.display='none'\"></div>\n        <div class=\"cat__body\"><span class=\"cat__num\">08</span><h3>{{CAT8_T}}</h3><p>{{CAT8_D}}</p></div>\n      </a>\n    </div>\n  </div>\n</section>\n\n<!-- ============================================================\n     SECTION 4 — Projects\n     IMAGE DIRECTION: one hero shot per case study — smoked Lacobel\n     mailbox front; multi-floor lobby with decorative cladding;\n     standardized modular mailbox/signage across stairwells.\n============================================================ -->\n<section class=\"section bg-paper\" id=\"proiecte\">\n  <div class=\"wrap\">\n    <div class=\"intro reveal\">\n      <div>\n        <span class=\"eyebrow eyebrow--muted intro__eyebrow\">{{PRJ_EYEBROW}}</span>\n        <h2 class=\"display-l\">{{PRJ_H2}}</h2>\n      </div>\n      <p class=\"lead intro__support\">{{PRJ_SUP}}</p>\n    </div>\n\n    <div class=\"projects\">\n      <article class=\"project reveal\">\n        <div class=\"frame m-glass\"><img src=\"{{P1_IMG}}\" alt=\"One North Lofts — front Lacobel fumuriu cu numerotare decupată laser\" onerror=\"this.style.display='none'\"></div>\n        <div>\n          <div class=\"project__meta\"><span class=\"project__index\">01</span><span class=\"project__tag\">{{P1_TAG}}</span></div>\n          <h3>{{P1_NAME}}</h3>\n          <p class=\"project__desc\">{{P1_DESC}}</p>\n          <ul class=\"spec\">{{P1_SPECS}}</ul>\n          <a class=\"link-arrow\" href=\"proiect-one-north-lofts.html\" style=\"margin-top:24px;display:inline-flex\">Vezi proiectul <span class=\"arrow\">&rarr;</span></a>\n        </div>\n      </article>\n\n      <article class=\"project reveal\">\n        <div class=\"project__order frame m-rib\"><img src=\"{{P2_IMG}}\" alt=\"Novum Residence — lobby cu placări decorative și semnalistică etaje\" onerror=\"this.style.display='none'\"></div>\n        <div>\n          <div class=\"project__meta\"><span class=\"project__index\">02</span><span class=\"project__tag\">{{P2_TAG}}</span></div>\n          <h3>{{P2_NAME}}</h3>\n          <p class=\"project__desc\">{{P2_DESC}}</p>\n          <ul class=\"spec\">{{P2_SPECS}}</ul>\n          <a class=\"link-arrow\" href=\"proiect-novum-residence.html\" style=\"margin-top:24px;display:inline-flex\">Vezi proiectul <span class=\"arrow\">&rarr;</span></a>\n        </div>\n      </article>\n\n      <article class=\"project reveal\">\n        <div class=\"frame m-metal\"><img src=\"{{P3_IMG}}\" alt=\"North Avenue Living — soluție modulară standardizată pe mai multe scări\" onerror=\"this.style.display='none'\"></div>\n        <div>\n          <div class=\"project__meta\"><span class=\"project__index\">03</span><span class=\"project__tag\">{{P3_TAG}}</span></div>\n          <h3>{{P3_NAME}}</h3>\n          <p class=\"project__desc\">{{P3_DESC}}</p>\n          <ul class=\"spec\">{{P3_SPECS}}</ul>\n          <a class=\"link-arrow\" href=\"proiect-north-avenue-living.html\" style=\"margin-top:24px;display:inline-flex\">Vezi proiectul <span class=\"arrow\">&rarr;</span></a>\n        </div>\n      </article>\n    </div>\n  </div>\n</section>\n\n<!-- ============================================================\n     SECTION 5 — Benefits (dark, architectural linework)\n============================================================ -->\n<section class=\"section bg-dark\">\n  <div class=\"wrap\">\n    <div class=\"intro reveal\">\n      <div>\n        <span class=\"eyebrow intro__eyebrow\">{{BEN_EYEBROW}}</span>\n        <h2 class=\"display-l\" style=\"color:var(--paper)\">{{BEN_H2}}</h2>\n      </div>\n      <p class=\"lead intro__support\" style=\"color:var(--muted-light)\">{{BEN_SUP}}</p>\n    </div>\n\n    <div class=\"benefits__grid reveal\">\n      <div class=\"benefit\">\n        <svg viewBox=\"0 0 48 48\"><rect x=\"7\" y=\"7\" width=\"34\" height=\"34\"/><path d=\"M7 17h34M17 17v24\"/></svg>\n        <h3>{{BEN1_T}}</h3>\n        <p>{{BEN1_D}}</p>\n      </div>\n      <div class=\"benefit\">\n        <svg viewBox=\"0 0 48 48\"><path d=\"M8 40 24 8l16 32z\"/><path d=\"M14 28h20\"/></svg>\n        <h3>{{BEN2_T}}</h3>\n        <p>{{BEN2_D}}</p>\n      </div>\n      <div class=\"benefit\">\n        <svg viewBox=\"0 0 48 48\"><circle cx=\"24\" cy=\"24\" r=\"16\"/><path d=\"M24 8v32M8 24h32\"/></svg>\n        <h3>{{BEN3_T}}</h3>\n        <p>{{BEN3_D}}</p>\n      </div>\n      <div class=\"benefit\">\n        <svg viewBox=\"0 0 48 48\"><rect x=\"8\" y=\"10\" width=\"10\" height=\"28\"/><rect x=\"20\" y=\"10\" width=\"10\" height=\"28\"/><rect x=\"32\" y=\"10\" width=\"8\" height=\"28\"/></svg>\n        <h3>{{BEN4_T}}</h3>\n        <p>{{BEN4_D}}</p>\n      </div>\n      <div class=\"benefit\">\n        <svg viewBox=\"0 0 48 48\"><path d=\"M10 38V18l14-10 14 10v20z\"/><path d=\"M20 38V26h8v12\"/></svg>\n        <h3>{{BEN5_T}}</h3>\n        <p>{{BEN5_D}}</p>\n      </div>\n      <div class=\"benefit\">\n        <svg viewBox=\"0 0 48 48\"><path d=\"M8 30c6-8 10-8 16 0s10 8 16 0\"/><path d=\"M8 18h32\"/></svg>\n        <h3>{{BEN6_T}}</h3>\n        <p>{{BEN6_D}}</p>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- ============================================================\n     SECTION 6 — Materials\n     IMAGE DIRECTION: macro close-ups — powder-coated metal edge,\n     RAL swatch, Lacobel reflection, Alucobond seam, brushed inox,\n     ribbed MDF, smoked glass, decorative PVC, laser-engraved edge.\n============================================================ -->\n<section class=\"section bg-paper\">\n  <div class=\"wrap\">\n    <div class=\"intro reveal\">\n      <div>\n        <span class=\"eyebrow eyebrow--muted intro__eyebrow\">{{MAT_EYEBROW}}</span>\n        <h2 class=\"display-l\">{{MAT_H2}}</h2>\n      </div>\n      <p class=\"lead intro__support\">{{MAT_SUP}}</p>\n    </div>\n\n    <div class=\"materials reveal\">\n      <div class=\"material\"><div class=\"frame m-ral\"><img src=\"https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?auto=format&fit=crop&w=800&q=80\" alt=\"Metal vopsit electrostatic\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>Metal vopsit electrostatic</h3><span>Mat / Texturat</span></div></div>\n      <div class=\"material\"><div class=\"frame m-bronze\"><img src=\"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80\" alt=\"Culori RAL\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>Culori RAL</h3><span>Paletă</span></div></div>\n      <div class=\"material\"><div class=\"frame m-glass\"><img src=\"https://images.unsplash.com/photo-1524230572899-a752b3835840?auto=format&fit=crop&w=800&q=80\" alt=\"Lacobel\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>Lacobel</h3><span>Sticlă vopsită</span></div></div>\n      <div class=\"material\"><div class=\"frame m-metal\"><img src=\"https://images.unsplash.com/photo-1535813547-99c456a41d4a?auto=format&fit=crop&w=800&q=80\" alt=\"Alucobond\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>Alucobond</h3><span>Compozit</span></div></div>\n      <div class=\"material\"><div class=\"frame m-metal\"><img src=\"https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=800&q=80\" alt=\"Inox satinat\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>Inox satinat</h3><span>Periat</span></div></div>\n      <div class=\"material\"><div class=\"frame m-rib\"><img src=\"https://images.unsplash.com/photo-1622372738946-62e02505feb3?auto=format&fit=crop&w=800&q=80\" alt=\"MDF riflat\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>MDF riflat</h3><span>Riflaj</span></div></div>\n      <div class=\"material\"><div class=\"frame m-glass\"><img src=\"https://images.unsplash.com/photo-1604147495798-57beb5d6af73?auto=format&fit=crop&w=800&q=80\" alt=\"Sticlă fumurie\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>Sticlă fumurie</h3><span>Fumuriu</span></div></div>\n      <div class=\"material\"><div class=\"frame m-pvc\"><img src=\"https://images.unsplash.com/photo-1615875605825-5eb9bb5d52ac?auto=format&fit=crop&w=800&q=80\" alt=\"PVC decorativ\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>PVC decorativ</h3><span>Folie / Panou</span></div></div>\n      <div class=\"material\"><div class=\"frame m-laser\"><img src=\"https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=800&q=80\" alt=\"Gravură și decupare laser\" onerror=\"this.style.display='none'\"></div><div class=\"material__name\"><h3>Gravură și decupare laser</h3><span>Precizie</span></div></div>\n    </div>\n  </div>\n</section>\n\n<!-- ============================================================\n     SECTION 7 — Process\n============================================================ -->\n<section class=\"section bg-stone\" id=\"proces\">\n  <div class=\"wrap\">\n    <div class=\"intro reveal\">\n      <div>\n        <span class=\"eyebrow eyebrow--muted intro__eyebrow\">{{PRO_EYEBROW}}</span>\n        <h2 class=\"display-l\">{{PRO_H2}}</h2>\n      </div>\n      <p class=\"lead intro__support\">{{PRO_SUP}}</p>\n    </div>\n\n    <div class=\"process reveal\">\n      <div class=\"step\"><span class=\"step__num\">01</span><h3>{{STEP1_T}}</h3><p>{{STEP1_D}}</p></div>\n      <div class=\"step\"><span class=\"step__num\">02</span><h3>{{STEP2_T}}</h3><p>{{STEP2_D}}</p></div>\n      <div class=\"step\"><span class=\"step__num\">03</span><h3>{{STEP3_T}}</h3><p>{{STEP3_D}}</p></div>\n      <div class=\"step\"><span class=\"step__num\">04</span><h3>{{STEP4_T}}</h3><p>{{STEP4_D}}</p></div>\n      <div class=\"step\"><span class=\"step__num\">05</span><h3>{{STEP5_T}}</h3><p>{{STEP5_D}}</p></div>\n    </div>\n  </div>\n</section>\n\n<!-- ============================================================\n     SECTION 8 — For developers (dark split)\n     IMAGE DIRECTION: tall photo of a repeated, standardized lobby\n     across stairwells of a larger development — consistency at scale.\n============================================================ -->\n<section class=\"section bg-black\" id=\"dezvoltatori\">\n  <div class=\"wrap\">\n    <div class=\"dev\">\n      <div class=\"reveal frame m-smoke\">\n        <img src=\"{{IMG_DEV}}\" alt=\"Amenajare standardizată replicată pe scările unui ansamblu rezidențial\" onerror=\"this.style.display='none'\">\n      </div>\n      <div class=\"reveal\" data-d=\"1\">\n        <span class=\"eyebrow\">{{DEV_EYEBROW}}</span>\n        <h2 class=\"display-l\" style=\"color:var(--paper);margin-top:18px\">{{DEV_H2}}</h2>\n        <p class=\"lead\" style=\"color:var(--muted-light);margin-top:20px\">{{DEV_INTRO}}</p>\n        <ul class=\"dev__list\">\n          <li><span class=\"k\">01</span><span class=\"v\">{{DEV1}}</span></li>\n          <li><span class=\"k\">02</span><span class=\"v\">{{DEV2}}</span></li>\n          <li><span class=\"k\">03</span><span class=\"v\">{{DEV3}}</span></li>\n          <li><span class=\"k\">04</span><span class=\"v\">{{DEV4}}</span></li>\n          <li><span class=\"k\">05</span><span class=\"v\">{{DEV5}}</span></li>\n          <li><span class=\"k\">06</span><span class=\"v\">{{DEV6}}</span></li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- ============================================================\n     SECTION 9 — Final CTA / form\n============================================================ -->\n<section class=\"section bg-dark\" id=\"contact\">\n  <div class=\"wrap\">\n    <div class=\"cta\">\n      <div class=\"cta__copy reveal\">\n        <span class=\"eyebrow\">{{CTA_EYEBROW}}</span>\n        <h2 class=\"display-l\" style=\"color:var(--paper);margin-top:18px\">{{CTA_H2}}</h2>\n        <p>{{CTA_TEXT}}</p>\n        <div class=\"rule\" style=\"margin-top:40px\"></div>\n        <div class=\"hero__trust\" style=\"margin-top:26px;color:var(--muted-light)\"><span class=\"dash\"></span>{{CTA_RESP}}</div>\n      </div>\n\n      <form class=\"form reveal\" data-d=\"1\" id=\"leadForm\" novalidate>\n        <div class=\"field\"><label for=\"company\">Nume companie</label><input id=\"company\" name=\"company\" type=\"text\" placeholder=\"Compania ta SRL\" required></div>\n        <div class=\"field\"><label for=\"contact\">Persoană de contact</label><input id=\"contact\" name=\"contact\" type=\"text\" placeholder=\"Nume și prenume\" required></div>\n        <div class=\"field\"><label for=\"phone\">Telefon</label><input id=\"phone\" name=\"phone\" type=\"tel\" placeholder=\"+40 7xx xxx xxx\" required></div>\n        <div class=\"field\"><label for=\"email\">Email</label><input id=\"email\" name=\"email\" type=\"email\" placeholder=\"nume@companie.ro\" required></div>\n        <div class=\"field\"><label for=\"city\">Oraș / Nume proiect</label><input id=\"city\" name=\"city\" type=\"text\" placeholder=\"București / Ansamblu Nord\" required></div>\n        <div class=\"field\"><label for=\"units\">Număr apartamente</label><input id=\"units\" name=\"units\" type=\"text\" placeholder=\"ex. 120\"></div>\n        <div class=\"field full\"><label for=\"message\">Mesaj</label><textarea id=\"message\" name=\"message\" placeholder=\"Descrie pe scurt proiectul, etapa și ce ai nevoie.\"></textarea></div>\n        <label class=\"file\" for=\"attach\">\n          <span id=\"fileLabel\">Atașează plan / randare / fotografii</span>\n          <span class=\"link-arrow\">Alege fișiere <span class=\"arrow\">→</span></span>\n          <input id=\"attach\" name=\"attach\" type=\"file\" multiple accept=\".pdf,.jpg,.jpeg,.png,.dwg,.zip\">\n        </label>\n        <div class=\"form__submit\">\n          <button type=\"submit\" class=\"btn btn--solid\">{{CTA_BTN}} <span class=\"arrow\">→</span></button>\n        </div>\n        <p class=\"form__note\">Prin trimiterea formularului ești de acord cu prelucrarea datelor conform Politicii de confidențialitate.</p>\n        <div class=\"form__done\"><strong style=\"font-family:var(--serif);font-size:1.4rem;display:block;margin-bottom:8px\">Solicitarea a fost înregistrată.</strong>Îți mulțumim. Revenim cu o propunere adaptată proiectului în cel mai scurt timp.</div>\n      </form>\n    </div>\n  </div>\n</section>\n</main>\n\n<!-- ============================================================\n     FOOTER\n============================================================ -->\n<footer class=\"footer\">\n  <div class=\"wrap\">\n    <div class=\"footer__top\">\n      <div class=\"footer__brand\">\n        <a href=\"#top\" class=\"brand\">{{BRAND}}</a>\n        <p>{{FOOT_DESC}}</p>\n        <div class=\"footer__social\">\n          <a href=\"#\" aria-label=\"LinkedIn\"><svg viewBox=\"0 0 24 24\"><path d=\"M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM2.4 9h5.16v13H2.4zM9.5 9h4.94v1.78h.07c.69-1.25 2.38-2.56 4.9-2.56 5.24 0 6.2 3.32 6.2 7.64V22h-5.16v-5.6c0-1.34-.02-3.06-1.9-3.06-1.9 0-2.2 1.46-2.2 2.96V22H9.5z\"/></svg></a>\n          <a href=\"#\" aria-label=\"Instagram\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 2.2c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.21 15.58 2.2 15.2 2.2 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.21 8.8 2.2 12 2.2zm0 1.8c-3.15 0-3.5.01-4.74.07-.96.04-1.48.2-1.83.34-.46.18-.79.39-1.13.74-.35.34-.56.67-.74 1.13-.13.35-.3.87-.34 1.83C3.21 8.5 3.2 8.85 3.2 12s.01 3.5.07 4.74c.04.96.2 1.48.34 1.83.18.46.39.79.74 1.13.34.35.67.56 1.13.74.35.13.87.3 1.83.34 1.24.06 1.59.07 4.74.07s3.5-.01 4.74-.07c.96-.04 1.48-.2 1.83-.34.46-.18.79-.39 1.13-.74.35-.34.56-.67.74-1.13.13-.35.3-.87.34-1.83.06-1.24.07-1.59.07-4.74s-.01-3.5-.07-4.74c-.04-.96-.2-1.48-.34-1.83a3 3 0 0 0-.74-1.13 3 3 0 0 0-1.13-.74c-.35-.13-.87-.3-1.83-.34C15.5 4.01 15.15 4 12 4zm0 3.06A4.94 4.94 0 1 1 12 17a4.94 4.94 0 0 1 0-9.88zm0 1.8a3.14 3.14 0 1 0 0 6.28 3.14 3.14 0 0 0 0-6.28zM17.34 6a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3z\"/></svg></a>\n          <a href=\"#\" aria-label=\"Facebook\"><svg viewBox=\"0 0 24 24\"><path d=\"M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46H15.2c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z\"/></svg></a>\n        </div>\n      </div>\n\n      <div class=\"footer__col\">\n        <h4>Navigare</h4>\n        <ul>\n          <li><a href=\"#top\">Acasă</a></li>\n          <li><a href=\"#amenajari\">Amenajări lobby</a></li>\n          <li><a href=\"#proiecte\">Proiecte</a></li>\n          <li><a href=\"#solutii\">Soluții</a></li>\n          <li><a href=\"#proces\">Proces</a></li>\n          <li><a href=\"#contact\">Contact</a></li>\n        </ul>\n      </div>\n\n      <div class=\"footer__col\">\n        <h4>Soluții</h4>\n        <ul>\n          <li><a href=\"#solutii\">Cutii poștale și aviziere</a></li>\n          <li><a href=\"#solutii\">Placări și panouri</a></li>\n          <li><a href=\"#solutii\">Semnalistică și orientare</a></li>\n          <li><a href=\"#solutii\">Identitate vizuală</a></li>\n          <li><a href=\"#solutii\">Mascări tehnice</a></li>\n          <li><a href=\"#dezvoltatori\">Pentru dezvoltatori</a></li>\n        </ul>\n      </div>\n\n      <div class=\"footer__col footer__contact\">\n        <h4>Contact</h4>\n        <div class=\"row\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 4h16v16H4z\"/><path d=\"m4 6 8 6 8-6\"/></svg><span>{{FOOT_EMAIL}}</span></div>\n        <div class=\"row\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 4h4l2 5-3 2a14 14 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 6a2 2 0 0 1 2-2z\"/></svg><span>{{FOOT_PHONE}}</span></div>\n        <div class=\"row\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z\"/><circle cx=\"12\" cy=\"10\" r=\"2.5\"/></svg><span>{{FOOT_AREA1}}<br>{{FOOT_AREA2}}</span></div>\n      </div>\n    </div>\n\n    <div class=\"footer__bottom\">\n      <span>© 2026 {{BRAND}}. Toate drepturile rezervate.</span>\n      <div class=\"links\">\n        <a href=\"#\">Politica de confidențialitate</a>\n        <a href=\"#\">Termeni și condiții</a>\n      </div>\n    </div>\n  </div>\n</footer>";
+  var PRJ_TMPL = "<div class=\"scroll-progress\" id=\"progress\"></div>\n<header class=\"header\" id=\"header\">\n  <div class=\"wrap header__inner\">\n    <a href=\"index.html\" class=\"brand\">{{BRAND}}</a>\n    <nav class=\"nav\" id=\"nav\">\n      <a href=\"index.html\">Acasă</a>\n      <a href=\"index.html#amenajari\">Amenajări lobby</a>\n      <a href=\"index.html#proiecte\">Proiecte</a>\n      <a href=\"index.html#solutii\">Soluții</a>\n      <a href=\"index.html#dezvoltatori\">Pentru dezvoltatori</a>\n      <a href=\"index.html#proces\">Proces</a>\n      <a href=\"index.html#contact\">Contact</a>\n    </nav>\n    <div class=\"header__cta\">\n      <a href=\"index.html#contact\" class=\"btn btn--solid\">Solicită un concept <span class=\"arrow\">→</span></a>\n    </div>\n    <button class=\"nav-toggle\" id=\"navToggle\" aria-label=\"Meniu\" aria-expanded=\"false\"><span></span><span></span><span></span></button>\n  </div>\n</header>\n\n<main>\n<section class=\"phero\">\n  <div class=\"phero__media\"><div class=\"frame m-smoke\"><img src=\"{{P_IMG}}\" alt=\"{{P_NAME}} — zona de acces amenajată\" onerror=\"this.style.display='none'\"></div></div>\n  <div class=\"wrap phero__inner\">\n    <a href=\"index.html#proiecte\" class=\"pback\">← Toate proiectele</a>\n    <div><span class=\"eyebrow\">Studiu de caz · {{P_TAG}}</span></div>\n    <h1 class=\"display-xl\">{{P_NAME}}</h1>\n    <p class=\"phero__tag\">{{P_DESC}}</p>\n  </div>\n</section>\n\n<section class=\"bg-stone\">\n  <div class=\"wrap\">\n    <div class=\"factsheet\">\n      <div class=\"cell\"><span>Localizare</span><strong>{{P_LOC}}</strong></div>\n      <div class=\"cell\"><span>An</span><strong>{{P_YEAR}}</strong></div>\n      <div class=\"cell\"><span>Tip proiect</span><strong>{{P_TYPE}}</strong></div>\n      <div class=\"cell\"><span>Apartamente</span><strong>{{P_UNITS}}</strong></div>\n    </div>\n  </div>\n</section>\n\n<section class=\"section bg-paper\">\n  <div class=\"wrap\">\n    <div class=\"intro reveal\" style=\"margin-bottom:clamp(36px,4vw,56px)\">\n      <div>\n        <span class=\"eyebrow eyebrow--muted intro__eyebrow\">Prezentare</span>\n        <h2 class=\"display-l\">Despre proiect</h2>\n      </div>\n      <p class=\"lead intro__support\">{{P_INTRO}}</p>\n    </div>\n    <div class=\"prose reveal\">\n      <p>{{P_BODY1}}</p>\n      <p>{{P_BODY2}}</p>\n    </div>\n  </div>\n</section>\n\n<section class=\"section bg-stone\">\n  <div class=\"wrap deliver\">\n    <div class=\"reveal\">\n      <span class=\"eyebrow eyebrow--muted\">Intervenție</span>\n      <h3 style=\"margin-top:14px\">Ce am livrat</h3>\n      <ul class=\"spec\" style=\"margin-top:18px\">{{P_SCOPE}}</ul>\n    </div>\n    <div class=\"reveal\" data-d=\"1\">\n      <span class=\"eyebrow eyebrow--muted\">Materiale folosite</span>\n      <div class=\"chips\">{{P_MATERIALS}}</div>\n    </div>\n  </div>\n</section>\n\n<section class=\"section bg-dark\">\n  <div class=\"wrap\">\n    <span class=\"eyebrow\">Galerie</span>\n    <div class=\"pgallery reveal\">\n      <div class=\"frame m-glass g1\"><img src=\"{{P_IMG2}}\" alt=\"{{P_NAME}} — detaliu\" onerror=\"this.style.display='none'\"></div>\n      <div class=\"frame m-rib\"><img src=\"{{P_IMG3}}\" alt=\"{{P_NAME}} — material\" onerror=\"this.style.display='none'\"></div>\n      <div class=\"frame m-metal\"><img src=\"{{P_IMG4}}\" alt=\"{{P_NAME}} — finisaj\" onerror=\"this.style.display='none'\"></div>\n    </div>\n  </div>\n</section>\n\n<section class=\"section bg-paper\">\n  <div class=\"wrap\">\n    <span class=\"eyebrow eyebrow--muted\">Alte proiecte</span>\n    <div class=\"nextgrid reveal\">{{P_NEXT}}</div>\n  </div>\n</section>\n\n<section class=\"section bg-dark\">\n  <div class=\"wrap\" style=\"text-align:center;max-width:720px;margin-inline:auto\">\n    <span class=\"eyebrow\">Hai să începem</span>\n    <h2 class=\"display-l\" style=\"color:var(--paper);margin:18px 0 16px\">Ai un proiect rezidențial similar?</h2>\n    <p class=\"lead\" style=\"color:var(--muted-light);margin-bottom:30px\">Trimite planul zonei de acces, randările sau câteva fotografii din șantier. Îți propunem o soluție adaptată arhitecturii și nivelului proiectului.</p>\n    <a href=\"index.html#contact\" class=\"btn btn--solid\">Solicită o propunere <span class=\"arrow\">→</span></a>\n  </div>\n</section>\n</main>\n\n<footer class=\"footer\">\n  <div class=\"wrap\">\n    <div class=\"footer__top\">\n      <div class=\"footer__brand\">\n        <a href=\"index.html\" class=\"brand\" style=\"color:var(--paper)\">{{BRAND}}</a>\n        <p style=\"margin-top:16px\">{{FOOT_DESC}}</p>\n      </div>\n      <div class=\"footer__col\">\n        <h4>Navigare</h4>\n        <ul>\n          <li><a href=\"index.html\">Acasă</a></li>\n          <li><a href=\"index.html#amenajari\">Amenajări lobby</a></li>\n          <li><a href=\"index.html#proiecte\">Proiecte</a></li>\n          <li><a href=\"index.html#solutii\">Soluții</a></li>\n          <li><a href=\"index.html#proces\">Proces</a></li>\n          <li><a href=\"index.html#contact\">Contact</a></li>\n        </ul>\n      </div>\n      <div class=\"footer__col\">\n        <h4>Proiecte</h4>\n        <ul>{{P_FOOTLINKS}}</ul>\n      </div>\n      <div class=\"footer__col footer__contact\">\n        <h4>Contact</h4>\n        <div class=\"row\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 4h16v16H4z\"/><path d=\"m4 6 8 6 8-6\"/></svg><span>{{FOOT_EMAIL}}</span></div>\n        <div class=\"row\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 4h4l2 5-3 2a14 14 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 6a2 2 0 0 1 2-2z\"/></svg><span>{{FOOT_PHONE}}</span></div>\n        <div class=\"row\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z\"/><circle cx=\"12\" cy=\"10\" r=\"2.5\"/></svg><span>{{FOOT_AREA1}}<br>{{FOOT_AREA2}}</span></div>\n      </div>\n    </div>\n    <div class=\"footer__bottom\">\n      <span>© 2026 {{BRAND}}. Toate drepturile rezervate.</span>\n      <div class=\"links\"><a href=\"index.html\">Politica de confidențialitate</a><a href=\"index.html\">Termeni și condiții</a></div>\n    </div>\n  </div>\n</footer>";
+  var DATA = JSON.parse(JSON.stringify(DEFAULTS));
+
+  // ----- shared render helpers (same rules as the admin) -----
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function escUrl(s){return String(s==null?'':s).replace(/"/g,'&quot;');}
+  function toLis(s){return String(s||'').split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');}
+  function toChips(s){return String(s||'').split(',').map(function(x){return x.trim();}).filter(Boolean).map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join('');}
+  function isImg(t){return t.indexOf('IMG_')===0||/_IMG$/.test(t)||/_IMG\d$/.test(t);}
+  function fillToken(h,tok,val,type){var rep; if(type==='lines')rep=toLis(val); else if(type==='csv')rep=toChips(val); else if(type==='url'||isImg(tok))rep=escUrl(val); else rep=esc(val); return h.split('{{'+tok+'}}').join(rep);}
+  function buildIndex(tmpl){var h=tmpl; for(var tok in DATA){h=fillToken(h,tok,DATA[tok],TYPE[tok]);} return h;}
+  function buildProject(tmpl,i){
+    var h=tmpl, g=function(s){return DATA['P'+i+'_'+s];};
+    var map={P_NAME:['NAME','text'],P_DESC:['DESC','text'],P_TAG:['TAG','text'],P_LOC:['LOC','text'],P_YEAR:['YEAR','text'],P_TYPE:['TYPE','text'],P_UNITS:['UNITS','text'],P_INTRO:['INTRO','text'],P_BODY1:['BODY1','text'],P_BODY2:['BODY2','text'],P_IMG:['IMG','url'],P_IMG2:['IMG2','url'],P_IMG3:['IMG3','url'],P_IMG4:['IMG4','url']};
+    for(var t in map){h=fillToken(h,t,g(map[t][0]),map[t][1]);}
+    h=h.split('{{P_SCOPE}}').join(toLis(g('SPECS')));
+    h=h.split('{{P_MATERIALS}}').join(toChips(g('MATERIALS')));
+    var next='',mats=['m-glass','m-rib','m-metal'],mi=0,j;
+    for(j=1;j<=SLUGS.length;j++){ if(j===i)continue;
+      next+='<a class="nextcard" href="'+SLUGS[j-1]+'"><div class="frame '+mats[mi%mats.length]+'"><img src="'+escUrl(DATA['P'+j+'_IMG'])+'" alt="'+esc(DATA['P'+j+'_NAME'])+'" onerror="this.style.display=\'none\'"></div><div class="nextcard__b"><h3>'+esc(DATA['P'+j+'_NAME'])+'</h3><span>Proiect \u2192</span></div></a>'; mi++; }
+    h=h.split('{{P_NEXT}}').join(next);
+    var fl=''; for(j=1;j<=SLUGS.length;j++){fl+='<li><a href="'+SLUGS[j-1]+'">'+esc(DATA['P'+j+'_NAME'])+'</a></li>';}
+    h=h.split('{{P_FOOTLINKS}}').join(fl);
+    ['BRAND','FOOT_DESC','FOOT_EMAIL','FOOT_PHONE','FOOT_AREA1','FOOT_AREA2'].forEach(function(t){h=fillToken(h,t,DATA[t],TYPE[t]||'text');});
+    return h;
+  }
+
+  // ----- Supabase -----
+  var sb=null;
+  function initSB(){
+    try{
+      var c=window.SB_CONFIG;
+      if(c && c.url && c.anonKey && c.url.indexOf('YOUR')===-1 && window.supabase){
+        sb=window.supabase.createClient(c.url,c.anonKey);
+      }
+    }catch(e){}
+    return sb;
+  }
+
+  // ----- UI interactions (re-attachable) -----
+  function initUI(){
+    var header=document.getElementById('header');
+    if(header){
+      var onScroll=function(){header.classList.toggle('scrolled',window.scrollY>40);};
+      onScroll(); window.addEventListener('scroll',onScroll,{passive:true});
+      var toggle=document.getElementById('navToggle');
+      if(toggle){toggle.addEventListener('click',function(){var o=header.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',o);});}
+      Array.prototype.forEach.call(document.querySelectorAll('#nav a,.header__cta a'),function(a){a.addEventListener('click',function(){header.classList.remove('menu-open');});});
+    }
+    if('IntersectionObserver' in window){
+      var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:0.14,rootMargin:'0px 0px -8% 0px'});
+      Array.prototype.forEach.call(document.querySelectorAll('.reveal, #annotated'),function(el){io.observe(el);});
+    } else { Array.prototype.forEach.call(document.querySelectorAll('.reveal, #annotated'),function(el){el.classList.add('in');}); }
+    var p=document.getElementById('progress');
+    if(p){var up=function(){var h=document.documentElement,sc=h.scrollTop||document.body.scrollTop,mx=h.scrollHeight-h.clientHeight;p.style.width=(mx>0?sc/mx*100:0)+'%';};up();window.addEventListener('scroll',up,{passive:true});window.addEventListener('resize',up);}
+    var attach=document.getElementById('attach'),fileLabel=document.getElementById('fileLabel');
+    if(attach&&fileLabel){attach.addEventListener('change',function(){var n=attach.files.length;fileLabel.textContent=n?(n===1?attach.files[0].name:n+' fișiere selectate'):'Atașează plan / randare / fotografii';});}
+    initForm();
+  }
+
+  function initForm(){
+    var form=document.getElementById('leadForm'); if(!form) return;
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var req=form.querySelectorAll('[required]'), ok=true;
+      Array.prototype.forEach.call(req,function(f){ if(!f.value.trim()){ok=false;f.style.borderColor='#b9573f';} else f.style.borderColor=''; });
+      if(!ok){ var first=form.querySelector('[required]'); if(first&&!first.value.trim())first.focus(); return; }
+      var v=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+      var payload={company:v('company'),contact_name:v('contact'),phone:v('phone'),email:v('email'),city_project:v('city'),apartments:v('units'),message:v('message')};
+      var done=function(){form.classList.add('sent');};
+      var fail=function(msg){
+        var note=form.querySelector('.form__note');
+        if(note){note.textContent=msg;note.style.color='#c9776a';}
+      };
+      if(sb){
+        sb.from('leads').insert(payload).then(function(r){ if(r.error){fail('Trimitere eșuată. Reîncearcă sau scrie-ne pe email.');} else {done();} },
+          function(){fail('Trimitere eșuată. Reîncearcă sau scrie-ne pe email.');});
+      } else {
+        // backend not configured yet — still confirm to the visitor in preview
+        done();
+      }
+    });
+  }
+
+  // ----- boot -----
+  function render(page){
+    var app=document.getElementById('app'); if(!app) return;
+    if(page==='index'){ app.innerHTML=buildIndex(INDEX_TMPL); }
+    else if(page==='project'){ var i=parseInt(document.body.getAttribute('data-proj'),10)||1; app.innerHTML=buildProject(PRJ_TMPL,i); }
+  }
+  function boot(){
+    var page=document.body.getAttribute('data-page');
+    initSB();
+    var go=function(remote){
+      if(remote && typeof remote==='object'){ for(var k in remote){ if(k in DATA) DATA[k]=remote[k]; } render(page); }
+      initUI();
+    };
+    if(sb){
+      sb.from('site_content').select('data').eq('id',1).maybeSingle().then(function(r){
+        go(r && r.data ? r.data.data : null);
+      },function(){ go(null); });
+    } else { go(null); }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+})();
+
+</script>
+</body>
+</html>
