@@ -182,7 +182,7 @@ img{display:block;max-width:100%}
   <div class="step">
     <span class="step__n"><b>4</b> Numerotare</span>
     <h2>Cum numerotăm cutiile?</h2>
-    <p class="hint">Numărul apare pe partea stângă a ușii.</p>
+    <p class="hint">Numărul apare pe partea dreaptă a ușii; logo-ul (la sticlă) pe stânga.</p>
     <div class="opts" id="numberingOpts">
       <div class="opt sel" data-num="clasic"><div class="t">Clasică</div><div class="d">1, 2, 3, 4…</div></div>
       <div class="opt" data-num="prefix"><div class="t">Cu prefix</div><div class="d">ex. A1, A2…</div></div>
@@ -228,7 +228,11 @@ img{display:block;max-width:100%}
   <div class="step">
     <span class="step__n"><b>8</b> Vizualizare</span>
     <h2>Vezi cum ar arăta la tine</h2>
-    <p class="hint">Generăm o imagine orientativă pe peretele tău.</p>
+    <p class="hint">Alege stilul, apoi generăm imaginea.</p>
+    <div class="opts" id="modeOpts" style="margin-bottom:16px">
+      <div class="opt sel" data-mode="fidel"><div class="t">Peretele meu</div><div class="d">Finisat, geometrie păstrată</div></div>
+      <div class="opt" data-mode="premium"><div class="t">Design nou</div><div class="d">Lobby premium aspirațional</div></div>
+    </div>
     <button class="btn btn--primary" id="btnGenerate" disabled>Generează vizualizarea</button>
     <div class="note" id="genNote">Adaugă întâi o poză și alege materialul.</div>
     <div class="loading hidden" id="loading">
@@ -272,7 +276,7 @@ try{var c=window.SB_CONFIG;if(c&&c.url&&c.anonKey&&c.url.indexOf('YOUR')===-1&&w
 
 var TOKEN=new URLSearchParams(location.search).get('c')||new URLSearchParams(location.search).get('p')||'';
 var S={ token:TOKEN, photo:null, material:null, frameColor:null, doorColor:null, boxCount:12, avizier:'none',
-        numberingType:'clasic', numberingPrefix:'', hasLogo:false, description:'', render:null, genCount:0 };
+        numberingType:'clasic', numberingPrefix:'', hasLogo:false, description:'', mode:'fidel', render:null, genCount:0 };
 
 var RAL=[
  {name:'Alb 9010',hex:'#f1f0ea'},{name:'Negru 9005',hex:'#0d0d0d'},
@@ -325,6 +329,10 @@ function initUI(){
   $('numPrefix').addEventListener('input',function(){ S.numberingPrefix=$('numPrefix').value; });
   $('hasLogo').addEventListener('change',function(){ S.hasLogo=$('hasLogo').checked; });
   $('desc').addEventListener('input',function(){ S.description=$('desc').value; });
+  // stil vizualizare
+  Array.prototype.forEach.call($('modeOpts').children,function(el){
+    el.addEventListener('click',function(){ selectOne('modeOpts',el); S.mode=el.getAttribute('data-mode'); });
+  });
   // counter
   $('minus').addEventListener('click',function(){ setCount(S.boxCount-1); });
   $('plus').addEventListener('click',function(){ setCount(S.boxCount+1); });
@@ -412,7 +420,7 @@ async function generate(){
     var resp=await fetch('/api/render',{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ image:S.photo, material:S.material, frameColor:S.frameColor, doorColor:S.doorColor,
-        boxCount:S.boxCount, avizier:S.avizier, numberingType:S.numberingType, numberingPrefix:S.numberingPrefix,
+        boxCount:S.boxCount, avizier:S.avizier, mode:S.mode, numberingType:S.numberingType, numberingPrefix:S.numberingPrefix,
         hasLogo:S.hasLogo, description:S.description })
     });
     var data=await resp.json();
