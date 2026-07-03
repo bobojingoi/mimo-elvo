@@ -14,7 +14,8 @@ module.exports = async (req, res) => {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-    const { image, material, frameColor, doorColor, boxCount, avizier, finish } = body;
+    const { image, material, frameColor, doorColor, boxCount, avizier, finish,
+            numberingType, numberingPrefix, hasLogo, description } = body;
     if (!image) return res.status(400).json({ error: 'Lipsește imaginea peretelui.' });
 
     const m = String(image).match(/^data:(image\/\w+);base64,(.+)$/);
@@ -22,7 +23,8 @@ module.exports = async (req, res) => {
     const mime = m[1];
     const buf = Buffer.from(m[2], 'base64');
 
-    const prompt = buildPrompt({ material, frameColor, doorColor, boxCount, avizier, finish });
+    const prompt = buildPrompt({ material, frameColor, doorColor, boxCount, avizier, finish,
+      numberingType, numberingPrefix, hasLogo, description });
 
     const form = new FormData();
     form.append('model', 'gpt-image-1.5');
@@ -53,6 +55,7 @@ module.exports = async (req, res) => {
 };
 
 function nameOf(c) { return (c && String(c).trim()) || 'gri neutru'; }
+function clean(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim().slice(0, 300); }
 
 function buildPrompt(o) {
   var n = parseInt(o.boxCount, 10);
@@ -60,12 +63,27 @@ function buildPrompt(o) {
   if (n > 300) n = 300;
   var mat;
   if (o.material === 'inox') {
-    mat = 'a wall-mounted mailbox bank with brushed stainless-steel (satin inox) doors set in a powder-coated steel frame in ' + nameOf(o.frameColor) + ', with small laser-cut apartment numbers on each door';
+    mat = 'a wall-mounted mailbox bank with brushed stainless-steel (satin inox) doors set in a powder-coated steel frame in ' + nameOf(o.frameColor);
   } else if (o.material === 'lacobel') {
-    mat = 'a wall-mounted mailbox bank with glossy Lacobel glass front doors in ' + nameOf(o.doorColor) + ' colour, in a slim metal frame in ' + nameOf(o.frameColor) + ', with sandblasted apartment numbers on the glass';
+    mat = 'a wall-mounted mailbox bank with glossy Lacobel glass front doors in ' + nameOf(o.doorColor) + ' colour, in a slim metal frame in ' + nameOf(o.frameColor);
   } else {
-    mat = 'a wall-mounted mailbox bank of powder-coated steel with a matte finish, doors painted ' + nameOf(o.doorColor) + ' and body/frame in ' + nameOf(o.frameColor) + ', with small laser-cut apartment numbers on each door';
+    mat = 'a wall-mounted mailbox bank of powder-coated steel with a matte finish, doors painted ' + nameOf(o.doorColor) + ' and body/frame in ' + nameOf(o.frameColor);
   }
+
+  // Numerotare (pe partea stângă a ușii)
+  var numbering;
+  if (o.numberingType === 'prefix' && clean(o.numberingPrefix)) {
+    var pfx = clean(o.numberingPrefix);
+    numbering = "Each door shows an apartment number on the LEFT side of the door, using the prefix '" + pfx + "' followed by a sequential number (" + pfx + "1, " + pfx + "2, " + pfx + "3 and so on).";
+  } else {
+    numbering = "Each door shows a plain sequential apartment number (1, 2, 3, ...) positioned on the LEFT side of the door.";
+  }
+  // Încuietori: mereu jos, pe mijloc
+  var locks = "Each door has a single small round lock / keyhole centered horizontally near the bottom edge of the door.";
+  // Logo opțional (doar sticlă Lacobel)
+  var logo = (o.material === 'lacobel' && o.hasLogo)
+    ? " On the glass doors, add a small, subtle sandblasted building logo on the LEFT side, next to the number."
+    : "";
 
   // Finisaj ambiental (opțional). Implicit: auto premium, ales de model.
   var finishMap = {
@@ -82,9 +100,14 @@ function buildPrompt(o) {
     'CRITICAL — preserve the architecture and geometry EXACTLY as in the photo: keep the same wall positions, the same columns, pilasters and niches/recesses, the same ceiling height and floor level, and the exact same camera angle and perspective. Do NOT move, add, remove, bend, straighten or reshape any structural element. The shape of the space must stay identical. ' +
     'Change ONLY the surface finishes and add the mailboxes: replace the raw drywall, concrete and clutter with ' + finish + ', add tasteful warm-white LED accent lighting in the vertical recesses between the columns, and a clean finished stone or polished-concrete floor. The design around the mailboxes must look intentional, harmonious and high-end. ' +
     'Cleanly install ' + mat + ' on the main wall surface. Arrange about ' + n + ' identical rectangular mailboxes in a neat, perfectly aligned grid of rows and columns, each door roughly 33 cm wide and 13 cm tall, mounted flat at chest height, all edges aligned, fully integrated with the surrounding finish. ' +
-    'Photorealistic, with natural lighting and shadows consistent with the space. No text, no watermark, no people, no tools or clutter.';
+    numbering + ' ' + locks + logo + ' ' +
+    'Photorealistic, with natural lighting and shadows consistent with the space. No random text, no watermark, no people, no tools or clutter.';
   if (o.avizier && o.avizier !== 'none') {
     p += ' On the same wall, aligned next to the mailboxes, also install a matching black-framed metal notice board (avizier) with a glass front, integrated into the finished design.';
+  }
+  var desc = clean(o.description);
+  if (desc) {
+    p += ' Additional client requests to respect where reasonable, without changing the room geometry: ' + desc + '.';
   }
   return p;
 }
