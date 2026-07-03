@@ -68,6 +68,8 @@ img{display:block;max-width:100%}
 .sw.sel .dot{border-color:var(--bronze);box-shadow:0 0 0 2px var(--bronze)}
 .sw .lbl{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.2}
 .fixed-note{background:var(--paper-2);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted)}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14px;color:var(--ink)}
+.toggle input{width:20px;height:20px;accent-color:var(--bronze)}
 
 /* number */
 .counter{display:flex;align-items:center;gap:14px}
@@ -176,9 +178,22 @@ img{display:block;max-width:100%}
     </div>
   </div>
 
+  <!-- 4. Numerotare -->
+  <div class="step">
+    <span class="step__n"><b>4</b> Numerotare</span>
+    <h2>Cum numerotăm cutiile?</h2>
+    <p class="hint">Numărul apare pe partea stângă a ușii.</p>
+    <div class="opts" id="numberingOpts">
+      <div class="opt sel" data-num="clasic"><div class="t">Clasică</div><div class="d">1, 2, 3, 4…</div></div>
+      <div class="opt" data-num="prefix"><div class="t">Cu prefix</div><div class="d">ex. A1, A2…</div></div>
+    </div>
+    <div class="field hidden" id="prefixField" style="margin-top:14px"><label>Prefix</label><input id="numPrefix" type="text" maxlength="6" placeholder="ex. A, Ap., Sc.1-"></div>
+    <div class="toggle hidden" id="logoToggle"><input type="checkbox" id="hasLogo"><label for="hasLogo">Adaugă logo sablat pe sticlă (partea stângă)</label></div>
+  </div>
+
   <!-- 4. Număr cutii -->
   <div class="step">
-    <span class="step__n"><b>4</b> Număr de cutii</span>
+    <span class="step__n"><b>5</b> Număr de cutii</span>
     <h2>Câte apartamente?</h2>
     <p class="hint">Numărul de cutii poștale necesare.</p>
     <div class="counter">
@@ -190,7 +205,7 @@ img{display:block;max-width:100%}
 
   <!-- 5. Avizier -->
   <div class="step">
-    <span class="step__n"><b>5</b> Avizier <span style="color:var(--muted-light);text-transform:none;letter-spacing:0;font-weight:500">(opțional)</span></span>
+    <span class="step__n"><b>6</b> Avizier <span style="color:var(--muted-light);text-transform:none;letter-spacing:0;font-weight:500">(opțional)</span></span>
     <h2>Adaugi și avizier?</h2>
     <p class="hint">Avizierul se montează de obicei lângă cutii, cu același aspect.</p>
     <div class="opts" id="avizierOpts">
@@ -201,9 +216,17 @@ img{display:block;max-width:100%}
     </div>
   </div>
 
-  <!-- 6. Generare -->
+  <!-- 7. Modificări dorite -->
   <div class="step">
-    <span class="step__n"><b>6</b> Vizualizare</span>
+    <span class="step__n"><b>7</b> Modificări dorite <span style="color:var(--muted-light);text-transform:none;letter-spacing:0;font-weight:500">(opțional)</span></span>
+    <h2>Ai cerințe speciale?</h2>
+    <p class="hint">Descrie orice detaliu de care să ținem cont la vizualizare și în ofertă.</p>
+    <div class="field"><textarea id="desc" rows="3" placeholder="ex. lumină mai caldă, finisaj marmură deschisă, montaj mai jos, o anumită culoare…" style="width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:15px;font-family:inherit;background:#fff;resize:vertical"></textarea></div>
+  </div>
+
+  <!-- 8. Generare -->
+  <div class="step">
+    <span class="step__n"><b>8</b> Vizualizare</span>
     <h2>Vezi cum ar arăta la tine</h2>
     <p class="hint">Generăm o imagine orientativă pe peretele tău.</p>
     <button class="btn btn--primary" id="btnGenerate" disabled>Generează vizualizarea</button>
@@ -215,6 +238,10 @@ img{display:block;max-width:100%}
     <div class="result hidden" id="result">
       <img id="resultImg" alt="Vizualizare">
       <div class="stack">
+        <div style="display:flex;gap:10px">
+          <button class="btn btn--ghost" id="btnDownload" style="flex:1">Descarcă</button>
+          <button class="btn btn--ghost" id="btnShare" style="flex:1">Trimite</button>
+        </div>
         <button class="btn btn--ghost" id="btnRegen">Regenerează</button>
       </div>
       <div class="note" id="regenNote"></div>
@@ -224,7 +251,7 @@ img{display:block;max-width:100%}
 
   <!-- 7. Contact + trimitere -->
   <div class="step">
-    <span class="step__n"><b>7</b> Trimite cererea</span>
+    <span class="step__n"><b>9</b> Trimite cererea</span>
     <h2>Datele tale de contact</h2>
     <p class="hint">Ca să putem reveni cu o propunere.</p>
     <div class="field"><label>Nume și prenume</label><input id="cName" type="text" placeholder="Nume Prenume"></div>
@@ -244,7 +271,8 @@ var SB=null;
 try{var c=window.SB_CONFIG;if(c&&c.url&&c.anonKey&&c.url.indexOf('YOUR')===-1&&window.supabase){SB=window.supabase.createClient(c.url,c.anonKey);}}catch(e){}
 
 var TOKEN=new URLSearchParams(location.search).get('c')||new URLSearchParams(location.search).get('p')||'';
-var S={ token:TOKEN, photo:null, material:null, frameColor:null, doorColor:null, boxCount:12, avizier:'none', render:null, genCount:0 };
+var S={ token:TOKEN, photo:null, material:null, frameColor:null, doorColor:null, boxCount:12, avizier:'none',
+        numberingType:'clasic', numberingPrefix:'', hasLogo:false, description:'', render:null, genCount:0 };
 
 var RAL=[
  {name:'Alb 9010',hex:'#f1f0ea'},{name:'Negru 9005',hex:'#0d0d0d'},
@@ -287,6 +315,16 @@ function initUI(){
   Array.prototype.forEach.call($('avizierOpts').children,function(el){
     el.addEventListener('click',function(){ selectOne('avizierOpts',el); S.avizier=el.getAttribute('data-av'); });
   });
+  // numerotare
+  Array.prototype.forEach.call($('numberingOpts').children,function(el){
+    el.addEventListener('click',function(){
+      selectOne('numberingOpts',el); S.numberingType=el.getAttribute('data-num');
+      $('prefixField').classList.toggle('hidden', S.numberingType!=='prefix');
+    });
+  });
+  $('numPrefix').addEventListener('input',function(){ S.numberingPrefix=$('numPrefix').value; });
+  $('hasLogo').addEventListener('change',function(){ S.hasLogo=$('hasLogo').checked; });
+  $('desc').addEventListener('input',function(){ S.description=$('desc').value; });
   // counter
   $('minus').addEventListener('click',function(){ setCount(S.boxCount-1); });
   $('plus').addEventListener('click',function(){ setCount(S.boxCount+1); });
@@ -297,6 +335,8 @@ function initUI(){
   // actions
   $('btnGenerate').addEventListener('click',generate);
   $('btnRegen').addEventListener('click',generate);
+  $('btnDownload').addEventListener('click',downloadImage);
+  $('btnShare').addEventListener('click',shareImage);
   $('btnSubmit').addEventListener('click',submit);
 }
 function selectOne(wrapId,el){ Array.prototype.forEach.call($(wrapId).children,function(c){c.classList.remove('sel');}); el.classList.add('sel'); }
@@ -316,6 +356,9 @@ function buildSwatches(wrapId,list,onPick){
 }
 function buildDoorSwatches(){
   var fixed=$('doorFixed'), wrap=$('doorSwatches'), lbl=$('doorLabel');
+  var isLacobel = (S.material==='lacobel');
+  $('logoToggle').classList.toggle('hidden', !isLacobel);
+  if(!isLacobel){ S.hasLogo=false; if($('hasLogo')) $('hasLogo').checked=false; }
   if(S.material==='inox'){
     wrap.classList.add('hidden'); fixed.classList.remove('hidden');
     lbl.textContent='Finisaj ușă'; S.doorColor='Inox satinat';
@@ -368,7 +411,9 @@ async function generate(){
   try{
     var resp=await fetch('/api/render',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ image:S.photo, material:S.material, frameColor:S.frameColor, doorColor:S.doorColor, boxCount:S.boxCount, avizier:S.avizier })
+      body:JSON.stringify({ image:S.photo, material:S.material, frameColor:S.frameColor, doorColor:S.doorColor,
+        boxCount:S.boxCount, avizier:S.avizier, numberingType:S.numberingType, numberingPrefix:S.numberingPrefix,
+        hasLogo:S.hasLogo, description:S.description })
     });
     var data=await resp.json();
     if(!resp.ok){ throw new Error(data.error||('Eroare '+resp.status)); }
@@ -385,6 +430,25 @@ async function generate(){
   $('btnGenerate').disabled=false;
 }
 
+/* ---------- descarcă / trimite ---------- */
+function downloadImage(){
+  if(!S.render) return;
+  var a=document.createElement('a'); a.href=S.render; a.download='vizualizare-mimo-elvo.jpg';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+async function shareImage(){
+  if(!S.render) return;
+  try{
+    var blob=await (await fetch(S.render)).blob();
+    var file=new File([blob],'vizualizare-mimo-elvo.jpg',{type:'image/jpeg'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({ files:[file], title:'Vizualizare cutii poștale', text:'Configurație MIMO ELVO' });
+    } else {
+      downloadImage();
+    }
+  }catch(e){ /* anulat de utilizator sau nesuportat */ }
+}
+
 /* ---------- trimitere ---------- */
 async function submit(){
   var name=$('cName').value.trim(), phone=$('cPhone').value.trim(), email=$('cEmail').value.trim();
@@ -396,7 +460,9 @@ async function submit(){
       p_token:S.token, p_contact_name:name, p_contact_phone:phone, p_contact_email:email,
       p_material:S.material, p_frame_color:S.frameColor, p_door_color:S.doorColor,
       p_box_count:S.boxCount, p_omega:false, p_avizier_model:S.avizier,
-      p_render_b64:S.render||null, p_notes:null
+      p_render_b64:S.render||null, p_notes:null,
+      p_numbering_type:S.numberingType, p_numbering_prefix:S.numberingPrefix||null,
+      p_has_logo:S.hasLogo, p_description:S.description||null
     });
     if(r.error) throw r.error;
     show('stateDone'); window.scrollTo(0,0);
