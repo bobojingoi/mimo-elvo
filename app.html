@@ -675,7 +675,7 @@ async function openRequest(id){
       row('Material',MAT_LABEL[r.material]||r.material)+
       row('Culoare cadru',r.frame_color)+
       row('Culoare/finisaj ușă',r.door_color)+
-      row('Numerotare', r.numbering_type==='prefix' ? ('Prefix „'+(r.numbering_prefix||'')+'” + număr (stânga)') : 'Clasică 1,2,3… (stânga)')+
+      row('Numerotare', r.numbering_type==='prefix' ? ('Prefix „'+(r.numbering_prefix||'')+'” + număr (dreapta)') : 'Clasică 1,2,3… (dreapta)')+
       (r.material==='lacobel'?row('Logo pe sticlă', r.has_logo?'Da (stânga)':'Nu'):'')+
       row('Număr cutii',r.box_count)+
       row('Profil Omega',r.omega?'Da':'Nu')+
