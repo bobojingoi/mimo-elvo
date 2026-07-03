@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-    const { image, material, frameColor, doorColor, boxCount, avizier, finish,
+    const { image, material, frameColor, doorColor, boxCount, avizier, finish, mode,
             numberingType, numberingPrefix, hasLogo, description } = body;
     if (!image) return res.status(400).json({ error: 'Lipsește imaginea peretelui.' });
 
@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
     const mime = m[1];
     const buf = Buffer.from(m[2], 'base64');
 
-    const prompt = buildPrompt({ material, frameColor, doorColor, boxCount, avizier, finish,
+    const prompt = buildPrompt({ material, frameColor, doorColor, boxCount, avizier, finish, mode,
       numberingType, numberingPrefix, hasLogo, description });
 
     const form = new FormData();
@@ -70,40 +70,49 @@ function buildPrompt(o) {
     mat = 'a wall-mounted mailbox bank of powder-coated steel with a matte finish, doors painted ' + nameOf(o.doorColor) + ' and body/frame in ' + nameOf(o.frameColor);
   }
 
-  // Numerotare (pe partea stângă a ușii)
+  // Numerotare: MEREU pe partea DREAPTĂ a ușii
   var numbering;
   if (o.numberingType === 'prefix' && clean(o.numberingPrefix)) {
     var pfx = clean(o.numberingPrefix);
-    numbering = "Each door shows an apartment number on the LEFT side of the door, using the prefix '" + pfx + "' followed by a sequential number (" + pfx + "1, " + pfx + "2, " + pfx + "3 and so on).";
+    numbering = "On each door place an apartment number on the RIGHT-hand side, using the prefix '" + pfx + "' followed by a sequential number (" + pfx + "1, " + pfx + "2, " + pfx + "3 and so on).";
   } else {
-    numbering = "Each door shows a plain sequential apartment number (1, 2, 3, ...) positioned on the LEFT side of the door.";
+    numbering = "On each door place a plain sequential apartment number (1, 2, 3, ...) on the RIGHT-hand side of the door.";
   }
   // Încuietori: mereu jos, pe mijloc
   var locks = "Each door has a single small round lock / keyhole centered horizontally near the bottom edge of the door.";
-  // Logo opțional (doar sticlă Lacobel)
+  // Logo opțional (doar sticlă Lacobel), pe STÂNGA
   var logo = (o.material === 'lacobel' && o.hasLogo)
-    ? " On the glass doors, add a small, subtle sandblasted building logo on the LEFT side, next to the number."
+    ? " On the LEFT-hand side of each glass door add a small, subtle sandblasted building logo."
     : "";
 
-  // Finisaj ambiental (opțional). Implicit: auto premium, ales de model.
-  var finishMap = {
-    marmura: 'large-format light marble-look wall cladding in warm ivory and beige tones',
-    piatra:  'large-format matte anthracite stone / porcelain wall cladding in dark charcoal tones',
-    lemn:    'warm wood-slat (riflaj) wall panelling in a natural oak tone combined with matte neutral plaster',
-    minimalist: 'smooth matte off-white micro-cement walls with a clean minimalist look'
-  };
-  var finish = finishMap[o.finish] || 'an elegant, cohesive premium finish that best suits the space (for example large-format stone or marble-look cladding in warm neutral tones, optionally combined with wood-slat accents)';
+  var boxes = 'Install ' + mat + '. Arrange about ' + n + ' identical rectangular mailboxes in a neat, perfectly aligned grid of rows and columns, each door roughly 33 cm wide and 13 cm tall, mounted flat at chest height, all edges aligned. ' + numbering + ' ' + locks + logo;
 
-  var p =
-    'This photo shows a residential building lobby / entrance hall during construction, with raw unfinished surfaces (green moisture-resistant drywall, exposed gypsum board, bare concrete, cables, protective sheeting on the floor). ' +
-    'Produce a photorealistic "after renovation" visualization of the SAME space, fully finished and elegant. ' +
-    'CRITICAL — preserve the architecture and geometry EXACTLY as in the photo: keep the same wall positions, the same columns, pilasters and niches/recesses, the same ceiling height and floor level, and the exact same camera angle and perspective. Do NOT move, add, remove, bend, straighten or reshape any structural element. The shape of the space must stay identical. ' +
-    'Change ONLY the surface finishes and add the mailboxes: replace the raw drywall, concrete and clutter with ' + finish + ', add tasteful warm-white LED accent lighting in the vertical recesses between the columns, and a clean finished stone or polished-concrete floor. The design around the mailboxes must look intentional, harmonious and high-end. ' +
-    'Cleanly install ' + mat + ' on the main wall surface. Arrange about ' + n + ' identical rectangular mailboxes in a neat, perfectly aligned grid of rows and columns, each door roughly 33 cm wide and 13 cm tall, mounted flat at chest height, all edges aligned, fully integrated with the surrounding finish. ' +
-    numbering + ' ' + locks + logo + ' ' +
-    'Photorealistic, with natural lighting and shadows consistent with the space. No random text, no watermark, no people, no tools or clutter.';
+  var p;
+  if (o.mode === 'premium') {
+    // MOD PREMIUM — reimaginare aspirațională
+    var finishMap = {
+      marmura: 'large-format light marble-look wall cladding in warm ivory and beige tones',
+      piatra:  'large-format matte anthracite stone / porcelain wall cladding in dark charcoal tones',
+      lemn:    'warm wood-slat (riflaj) wall panelling in a natural oak tone combined with matte neutral plaster',
+      minimalist: 'smooth matte off-white micro-cement walls with a clean minimalist look'
+    };
+    var finish = finishMap[o.finish] || 'an elegant, cohesive premium finish that best suits the space (for example large-format stone or marble-look cladding in warm neutral tones, optionally combined with wood-slat accents)';
+    p =
+      'This photo shows a residential building lobby / entrance hall that is unfinished (bare concrete, exposed insulation, mounting rails, protective sheeting). ' +
+      'Produce a photorealistic "after renovation" visualization of the same wall, fully finished and elegant, keeping the same general perspective and the position of the main wall. ' +
+      'Turn the raw surfaces into ' + finish + ', with tasteful warm-white LED accent lighting and a clean finished floor — a cohesive, high-end lobby design. ' +
+      boxes + ' Integrate the mailbox bank naturally into the finished wall. ' +
+      'Photorealistic, natural lighting and shadows. No random text, no watermark, no people, no tools or clutter.';
+  } else {
+    // MOD FIDEL — păstrează exact peretele fotografiat
+    p =
+      'This is a real photo of a building entrance / lobby wall that is partially finished. ' +
+      'Produce a photorealistic visualization of the SAME scene with these strict rules: keep the EXACT same camera angle, perspective, proportions and geometry; KEEP every finish that is already installed exactly as it appears (for example any existing stone or marble cladding, glass walls or partitions, the ceiling, columns and the metal mounting rails). Do NOT redesign the space, do NOT replace or restyle existing materials, do NOT change the viewpoint or the layout. ' +
+      'Make only these changes: (1) neatly finish the still-unfinished raw areas (bare concrete, exposed insulation, visible cabling, protective sheeting) with a clean finish that matches the materials already present nearby; and (2) ' + boxes + ' — mounted on the existing wall, on the area where the vertical mounting rails already are. ' +
+      'The result must clearly look like the same photographed wall, lightly completed, with the mailboxes added. Keep the existing lighting. Photorealistic. No random text, no watermark, no people, no tools or clutter.';
+  }
   if (o.avizier && o.avizier !== 'none') {
-    p += ' On the same wall, aligned next to the mailboxes, also install a matching black-framed metal notice board (avizier) with a glass front, integrated into the finished design.';
+    p += ' On the same wall, aligned next to the mailboxes, also install a matching black-framed metal notice board (avizier) with a glass front.';
   }
   var desc = clean(o.description);
   if (desc) {
