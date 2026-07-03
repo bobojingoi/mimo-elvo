@@ -630,7 +630,7 @@ async function loadRequests(){
   if($('reqBody')) $('reqBody').innerHTML='<tr><td colspan="7" class="empty">Se încarcă…</td></tr>';
   try{
     var r=await SB.from('config_requests')
-      .select('id,created_at,project_name,client_id,contact_name,contact_phone,contact_email,material,frame_color,door_color,box_count,omega,avizier_model,status')
+      .select('id,created_at,project_name,client_id,contact_name,contact_phone,contact_email,material,frame_color,door_color,box_count,omega,avizier_model,status,numbering_type,numbering_prefix,has_logo,description')
       .order('created_at',{ascending:false});
     if(r.error) throw r.error;
     REQUESTS=r.data||[];
@@ -675,12 +675,15 @@ async function openRequest(id){
       row('Material',MAT_LABEL[r.material]||r.material)+
       row('Culoare cadru',r.frame_color)+
       row('Culoare/finisaj ușă',r.door_color)+
+      row('Numerotare', r.numbering_type==='prefix' ? ('Prefix „'+(r.numbering_prefix||'')+'” + număr (stânga)') : 'Clasică 1,2,3… (stânga)')+
+      (r.material==='lacobel'?row('Logo pe sticlă', r.has_logo?'Da (stânga)':'Nu'):'')+
       row('Număr cutii',r.box_count)+
       row('Profil Omega',r.omega?'Da':'Nu')+
       row('Avizier',AVZ_LABEL[r.avizier_model]||r.avizier_model||'—')+
       row('Contact',r.contact_name)+row('Telefon',r.contact_phone)+
       row('Email',r.contact_email)+row('Status',r.status==='procesat'?'Procesat':'Nou')+
     '</div>'+
+    (r.description?'<div class="rel"><h3>Modificări dorite (client)</h3><div class="muted">'+esc(r.description)+'</div></div>':'')+
     '<div class="rel"><h3>Preț intern (calculat)</h3>'+
       '<div class="detail-grid">'+
         row('Cutii ('+(r.box_count||0)+' × '+(PRICE[r.material]||0)+')',money(p.boxes))+
