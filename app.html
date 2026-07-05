@@ -50,6 +50,8 @@ input,select,textarea{font-family:inherit}
 .navlink .b{font-size:11px;background:rgba(0,0,0,.15);padding:2px 8px;border-radius:100px}
 .navlink.active .b{background:rgba(0,0,0,.18)}
 .navlink[data-soon]{opacity:.55}
+/* NOU (Stanley): linkurile de tip <a> din nav nu se subliniaza */
+a.navlink{text-decoration:none}
 .side__foot{border-top:1px solid var(--line-d);padding-top:14px;font-size:12px;color:var(--muted-light)}
 .side__foot button{margin-top:10px;width:100%;background:transparent;border:1px solid var(--line-d);color:var(--paper);padding:9px;border-radius:100px;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 .side__foot button:hover{border-color:var(--bronze)}
@@ -181,8 +183,13 @@ tbody tr:hover{background:var(--paper-2)}
       <button class="navlink active" data-mod="clients">Clienți <span class="b" id="cntClients">0</span></button>
       <button class="navlink" data-mod="requests">Cereri configurator <span class="b" id="cntReq">0</span></button>
       <button class="navlink" data-mod="offers" data-soon>Oferte <span class="b">în curând</span></button>
+      <!-- MODIFICAT (Stanley, 05.07): „Facturi"->„Comenzi" si „Financiar"->link direct catre app-urile lui Eduard,
+           deschise in tab nou. Cod vechi, pastrat pentru referinta:
       <button class="navlink" data-mod="invoices" data-soon>Facturi <span class="b">în curând</span></button>
       <button class="navlink" data-mod="finance" data-soon>Financiar <span class="b">în curând</span></button>
+      -->
+      <a class="navlink" href="https://script.google.com/macros/s/AKfycbzi64RpCAYWYK6DTmmYI5chPMYNOREZYYIuDZVD2OZLaZ-wiMMzGXQoEwgWbR7qJNvo8A/exec" target="_blank" rel="noopener">Comenzi <span class="b">↗</span></a>
+      <a class="navlink" href="https://script.google.com/macros/s/AKfycbxufG3m2XSA408vF15CB7E0_RAHz8po7vbFTnP7z5GQVw0W8MZbbENmecnktg46AeASZg/exec" target="_blank" rel="noopener">Financiar <span class="b">↗</span></a>
     </nav>
     <div class="side__foot">
       <div id="userEmail">—</div>
@@ -781,6 +788,8 @@ function bind(){
   $('btnReloadReq').addEventListener('click',loadRequests);
   Array.prototype.forEach.call(document.querySelectorAll('.navlink'),function(b){
     b.addEventListener('click',function(){
+      /* NOU (Stanley): Comenzi & Financiar sunt <a> (linkuri externe) — le lasam browserului, nu-s tab-uri interne */
+      if(b.tagName==='A') return;
       var mod=b.getAttribute('data-mod');
       if(b.hasAttribute('data-soon')){ toast('Modulul „'+b.textContent.trim().split(' ')[0]+'” se activează în pasul următor.'); return; }
       showModule(mod);
